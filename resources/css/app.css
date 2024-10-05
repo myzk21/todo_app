@@ -37,4 +37,9 @@
     .toggle-switch input:checked + span::before {
         left: calc(100% - 1em + 0.05em);
     }
+
+    .custom-rotate-180 {
+        transition: transform 0.5s ease;
+        transform: rotate(180deg);
+    }
 }
