@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('label_id')->nullable();
-            $table->string('name');
+            $table->string('title');
             $table->text('description')->nullable();
             $table->date('due')->nullable();
             $table->boolean('is_completed')->default(false);
             $table->string('progress_rate')->nullable();
+            $table->string('priority')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
