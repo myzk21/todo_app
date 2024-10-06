@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->date('due')->nullable();
             $table->boolean('is_completed')->default(false);
-            $table->string('progress_rate')->nullable();
+            $table->integer('progress_rate')->nullable();
             $table->string('priority')->nullable();
             $table->timestamps();
             $table->softDeletes();
