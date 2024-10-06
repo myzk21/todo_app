@@ -13,10 +13,12 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite('resources/ts/todo_list/app.ts')
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+        <div class="min-h-screen bg-[#f9fafb]">
+            @include('layouts.header')
+            @include('layouts.login_header')
 
             <!-- Page Heading -->
             @isset($header)
