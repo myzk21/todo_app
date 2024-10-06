@@ -29,44 +29,50 @@
             </div>
 
             <div class="bg-white shadow-md rounded-lg w-3/4 overflow-x-auto">
-                <form action="" method="" class="" id="">
-                    <div class="flex px-6 pt-5 items-center">
-                        <input type="text" class="border border-gray-500 rounded h-8 placeholder:text-sm placeholder:text-gray-300 w-4/5" placeholder="TODOを入力">
+                <form action="" method="POST" class="" id="todo_create_form">
+                    @csrf
 
+                    {{--バリデーションエラー表示--}}
+                    <div id="errorContainer"></div>
+
+                    <div class="flex px-6 pt-5 items-center">
+                        <input type="text" class="border border-gray-500 rounded h-8 placeholder:text-sm placeholder:text-gray-300 w-4/5" placeholder="TODOを入力" name="title" value="{{ old('title') }}">
                         <div class="ml-2 flex flex-col items-center cursor-pointer" id="detail">
                             <p class="text-sm -mb-1 hover:underline select-none" id="detail_sign">詳細</p>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4" id="down_arrow">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                             </svg>
                         </div>
-                        <button class="bg-[#8b8a8e] text-white text-sm px-4 py-2 rounded h-8 ml-auto hover:bg-opacity-80 select-none">追加</button>
+                        <button class="bg-[#8b8a8e] text-white text-sm px-4 py-2 rounded h-8 ml-auto hover:bg-opacity-80 select-none" id="todo_add_btn">追加</button>
                     </div>
                     <div class="px-6 pb-5 pt-3 hidden" id="todo_content">
                         <div>
-                            <textarea placeholder="内容" class="placeholder:text-sm placeholder:text-gray-300 w-4/5 rounded"></textarea>
+                            <textarea placeholder="内容" class="placeholder:text-sm placeholder:text-gray-300 w-4/5 rounded" name="description">{{ old('description') }}</textarea>
                         </div>
                         <div class="flex flex-wrap pt-1">
                             <div class="w-full sm:w-auto mb-4 sm:mb-0">
                                 <label for="percentage">進捗率</label>
-                                <select id="percentage" class="rounded mr-4">
+                                <select id="percentage" class="rounded mr-4" name="progress_rate">
                                     <option value="">--</option>
                                     @for($i = 0; $i <= 100; $i += 10)
-                                        <option value="{{ $i }}">{{ $i }}%</option>
+                                        <option value="{{ $i }}" {{ old('progress_rate') == $i ? 'selected' : '' }}>
+                                            {{ $i }}%
+                                        </option>
                                     @endfor
                                 </select>
                             </div>
                             <div class="w-full sm:w-auto mb-4 sm:mb-0">
                                 <label for="priority">優先度</label>
-                                <select id="priority" class="rounded mr-4">
+                                <select id="priority" class="rounded mr-4" name="priority">
                                     <option value="">--</option>
-                                    <option value="high">高</option>
-                                    <option value="middle">中</option>
-                                    <option value="low">低</option>
+                                    <option value="high" {{ old('priority') == "high" ? 'selected' : '' }}>高</option>
+                                    <option value="middle" {{ old('priority') == "middle" ? 'selected' : '' }}>中</option>
+                                    <option value="low" {{ old('priority') == "low" ? 'selected' : '' }}>低</option>
                                 </select>
                             </div>
                             <div class="w-full sm:w-auto mb-4 sm:mb-0">
                                 <label for="due">期日</label>
-                                <input type="date" name="due" id="due" class="rounded">
+                                <input type="date" name="due" id="due" class="rounded" value="{{ old('due') }}">
                             </div>
                             {{--余裕あるならここにラベルを追加--}}
                         </div>
