@@ -19,6 +19,7 @@
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-[#f9fafb]">
             @include('layouts.header')
+            @include('todo.components.edit_form'){{--編集のモーダルウィンドウ--}}
             @include('layouts.login_header')
 
             <!-- Page Heading -->
@@ -31,7 +32,7 @@
             @endisset
 
             <!-- Page Content -->
-            <main>
+            <main">
                 {{ $slot }}
             </main>
         </div>

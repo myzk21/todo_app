@@ -2,6 +2,7 @@
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
+        <h2 class="font-bold text-center">新規登録</h2>
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
