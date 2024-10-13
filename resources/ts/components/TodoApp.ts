@@ -1,5 +1,7 @@
 import { TodoService } from '../services/TodoService';
 import { Todo } from '../classes/Todo';
+import { UpdateTodo } from '../classes/Todo';
+// import { ShowDetailTodoService } from '../services/ShowDetailTodoService';
 
 const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement).content;
 
@@ -11,7 +13,6 @@ export class TodoApp {
     private percentage: HTMLInputElement;
     private priority: HTMLInputElement;
     private due: HTMLInputElement;
-
 
     constructor(
         addButtonId: string,
@@ -34,6 +35,8 @@ export class TodoApp {
             event.preventDefault();
             this.addTodo();
         });
+        this.showTodo();
+        //editTodoも作成（保存処理）
     }
 
     // Todoの追加処理
@@ -58,7 +61,7 @@ export class TodoApp {
         }
     }
 
-    private renderTodo(newTodo: Todo) {
+    private renderTodo(newTodo: Todo) {//ここでもしすでにidがあったらアペンドで追加など新規と更新で処理を分ける
         console.log(newTodo);
         const todoTableBody = document.getElementById('todo-table') as HTMLElement;
         const newRow = document.createElement('tr');
@@ -73,7 +76,7 @@ export class TodoApp {
             <td class="px-4 py-3 text-center">${newTodo.priority ?? '--'}</td>
             <td class="px-4 py-3 text-center">${newTodo.due ?? '--'}</td>
             <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
-                <a href="#">詳細</a>
+                <a href="#" class="showBtn" todo-id="${newTodo.id}">詳細</a>
             </td>
             <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
                 <a href="#">
@@ -85,4 +88,98 @@ export class TodoApp {
         `;
         todoTableBody.appendChild(newRow);//追加
     }
+
+    private async showTodo() {
+        const showBtns = document.querySelectorAll('.showBtn') as NodeListOf<HTMLElement>;
+
+        showBtns.forEach((showBtn) => {
+            const todoId = showBtn.getAttribute('todo-id');
+            showBtn.addEventListener('click', async (event: MouseEvent) => {
+                //詳細を表示
+                const showTodo: Todo = await TodoService.showTodo(todoId);
+                this.createDetailModal(showTodo);
+            });
+        });
+    }
+
+    // Todoの更新処理
+    private async updateTodo() {
+        const todoUpdateForm = document.getElementById('todo_update_form') as HTMLFormElement;
+        const updateFormData = new FormData(todoUpdateForm);
+        updateFormData.append('_token', csrfToken);
+        if (!updateFormData) return;
+        try {
+            const updateTodo: UpdateTodo = await TodoService.updateTodo(updateFormData);//サービスクラスを呼び出してTodoを追加
+            //ここにダイアログ表示などの処理
+            console.log('Todoの更新に成功しました');
+        } catch (error) {
+            console.error('Todoの更新に失敗しました');
+        }
+    }
+
+    private createDetailModal(showTodo: Todo) {
+        const todoDetailModal = document.getElementById('todo_detail_modal') as HTMLElement;
+
+        const modalHTML = `
+            <div class="w-full h-full z-50 fixed insert-0 bg-black bg-opacity-50 flex items-center justify-center">
+                <div class="px-6 pb-5 pt-3 shadow-sm w-3/5 rounded bg-white" id="">
+                    <div class="pointer-events-none flex justify-end">
+                        <p class="text-4xl cursor-pointer hover:opacity-60 -mb-2 pointer-events-auto inline-block" id="close-show-todo">×</p>
+                    </div>
+                    <div id="updateErrorContainer"></div>
+                    <form id="todo_update_form">
+                        <input type="hidden" name="id" value="${showTodo.id}">
+                        <label for="todo_title_input" class="block pb-1">タイトル</label>
+                        <input type="text" class="border border-gray-500 rounded h-8 mb-2 placeholder:text-sm placeholder:text-gray-300 w-full" placeholder="TODOを入力" name="updateTitle" value="${showTodo.title}" id="todo_title_input">
+                        <label for="todo_description_input" class="block mb-1">内容</label>
+                        <textarea placeholder="内容" class="mb-1 placeholder:text-sm placeholder:text-gray-300 rounded w-full" name="updateDescription" id="todo_description_input">${showTodo.description ?? ''}</textarea>
+                        <div class="flex flex-wrap pt-1">
+                            <div class="w-full sm:w-auto mb-4 sm:mb-0">
+                                <label for="percentage">進捗率</label>
+                                <select id="percentage" class="rounded mr-4" name="updateProgress_rate">
+                                    <option value="">--</option>
+                                    ${Array.from({ length: 11 }, (_, i) => {
+                                        const value = i * 10; // 0, 10, 20, ..., 100
+                                        const showRateNum = Number(showTodo.progress_rate);
+                                        const isSelected = showRateNum == value ? 'selected' : '';
+                                        return `<option value="${value}" ${isSelected}>${value}%</option>`;
+                                    }).join('')}
+                                </select>
+                            </div>
+                            <div class="w-full sm:w-auto mb-4 sm:mb-0">
+                                <label for="priority">優先度</label>
+                                <select id="priority" class="rounded mr-4" name="updatePriority">
+                                    <option value="">--</option>
+                                    <option value="high" ${showTodo.priority == 'high' ? 'selected' : ''}>高</option>
+                                    <option value="middle" ${showTodo.priority == 'middle' ? 'selected' : ''}>中</option>
+                                    <option value="low" ${showTodo.priority == 'low' ? 'selected' : ''}>低</option>
+                                </select>
+                            </div>
+                            <div class="w-full sm:w-auto mb-4 sm:mb-0">
+                                <label for="due">期日</label>
+                                <input type="date" name="updateDue" id="due" class="rounded" value="${showTodo.due ?? ""}">
+                            </div>
+                        </div>
+                        <div class="w-full flex mt-1">
+                            <button class="bg-[#8b8a8e] text-white text-sm px-4 py-2 rounded ml-auto hover:bg-opacity-80 select-none flex justify-end" id="todo_update_btn">保存</button>
+                            <p class="hover:underline cursor-pointer px-4 py-2 text-gray-400 text-sm">削除</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            `;
+
+        todoDetailModal.innerHTML = modalHTML;//詳細を表示
+        const closeButton = todoDetailModal.querySelector('#close-show-todo') as HTMLElement;
+        closeButton.addEventListener('click', () => { //バツボタンがクリックされたときにモーダルを閉じる
+            todoDetailModal.innerHTML = '';
+        });
+
+        const addButton = document.getElementById('todo_update_btn') as HTMLElement;
+        addButton.addEventListener('click', (event: MouseEvent) => {
+            event.preventDefault();
+            this.updateTodo();//TODOの更新
+        });
+    }
+
 }

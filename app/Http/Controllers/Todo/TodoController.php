@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Todo;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\TodoStoreRequest;
+use App\Http\Requests\TodoUpdateRequest;
 use Carbon\Carbon;
 
 class TodoController extends Controller
@@ -149,7 +150,15 @@ class TodoController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user_id = Auth::id();
+        $todo = Todo::query()
+            ->where('user_id', $user_id)
+            ->where('id', $id)
+            ->first();
+        return response()->json([
+            'success' => true,
+            'todo' => $todo
+        ]);
     }
 
     /**
@@ -163,9 +172,23 @@ class TodoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(TodoUpdateRequest $request, string $id)
     {
-        //
+         //dd($request->all());//->完璧
+        $todo = Todo::findOrFail($id);
+        $todo->title = $request->input('updateTitle');
+        $todo->description = $request->input('updateDescription');
+        $todo->due = $request->input('updateDue');
+        $todo->when_completed = $request->input('when_completed');
+        $todo->progress_rate = $request->input('updateProgress_rate');
+        $todo->priority = $request->input('updatePriority');
+        $todo->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Todoが更新されました。',
+            'todo' => $todo
+        ]);
     }
 
     /**

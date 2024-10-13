@@ -73,7 +73,7 @@
                                     <td class="px-4 py-3 text-center">{{ $todo['progress_rate'] ?? '--' }}%</td>
                                     <td class="px-4 py-3 text-center">{{ $todo['priority'] ?? '--' }}</td>
                                     <td class="px-4 py-3 text-center">{{ $todo['due'] ?? '--' }}</td>
-                                    <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center"><a href="#">詳細</a></td>{{--ここで$todo['id']を送信ー＞そんなことしなくていいー＞そのまま表示させればよい→でもどうやって完了済みと見分ける？？--}}
+                                    <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center"><a href="#" class="showBtn" todo-id="{{ $todo['id'] }}">詳細</a></td>
                                     <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
                                         <a href="#">{{--ゴミ箱アイコン--}}
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5 text-gray-400">

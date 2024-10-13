@@ -1,6 +1,8 @@
 <div class="w-full h-full z-50 fixed insert-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div class="px-6 pb-5 pt-3 shadow-sm w-3/5 rounded bg-white" id="">
-        {{--ここに閉じるボタンを設置--}}
+        <div class="pointer-events-none flex justify-end">
+            <p class="text-4xl cursor-pointer hover:opacity-60 -mb-2 pointer-events-auto inline-block">×</p>{{--ここに閉じるボタンを設置--}}
+        </div>
         <label for="todo_title_input" class="block pb-1">タイトル</label>
         <input type="text" class="border border-gray-500 rounded h-8 mb-2 placeholder:text-sm placeholder:text-gray-300 w-full" placeholder="TODOを入力" name="title" value="{{ old('title') }}" id="todo_title_input">
         <label for="todo_description_input" class="block mb-1">内容</label>

@@ -23,6 +23,10 @@ Route::middleware('auth')->group(function () {
 
     //TODO作成
     Route::post('/add_todo', [TodoController::class, 'store']);
+    //TODO表示
+    Route::get('/show_todo/{id}', [TodoController::class, 'show']);
+    //TODO更新
+    Route::patch('/update_todo/{id}', [TodoController::class, 'update']);
 });
 
 require __DIR__.'/auth.php';
