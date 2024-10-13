@@ -5,6 +5,7 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
+        <h2 class="font-bold text-center">ログイン</h2>
         <!-- Email Address -->
         <div>
             <x-input-label for="email" :value="__('Email')" />

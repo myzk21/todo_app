@@ -2,6 +2,7 @@
     <form method="POST" action="{{ route('password.store') }}">
         @csrf
 
+        <h2 class="font-bold text-center">パスワードリセット</h2>
         <!-- Password Reset Token -->
         <input type="hidden" name="token" value="{{ $request->route('token') }}">
 

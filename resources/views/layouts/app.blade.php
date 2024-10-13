@@ -13,12 +13,15 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @vite('resources/ts/todo_list/app.ts')
         @vite('resources/ts/app.ts'){{--フロントエンドの処理ファイル--}}
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-[#f9fafb]">
             @include('layouts.header')
+            {{-- @include('todo.components.edit_form')編集のモーダルウィンドウ --}}
+            <div id="todo_detail_modal">
+                {{--ここにtodoの詳細をTSで表示--}}
+            </div>
             @include('layouts.login_header')
 
             <!-- Page Heading -->
@@ -31,7 +34,7 @@
             @endisset
 
             <!-- Page Content -->
-            <main>
+            <main">
                 {{ $slot }}
             </main>
         </div>

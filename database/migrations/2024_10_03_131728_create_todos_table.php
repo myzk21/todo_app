@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->date('due')->nullable();
-            $table->boolean('is_completed')->default(false);
+            $table->date('when_completed')->nullable();
             $table->integer('progress_rate')->nullable();
             $table->string('priority')->nullable();
             $table->timestamps();

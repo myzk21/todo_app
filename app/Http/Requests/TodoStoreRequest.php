@@ -24,8 +24,8 @@ class TodoStoreRequest extends FormRequest
         return [
             'title' => 'required|string|max:50',
             'description' => 'nullable|string|max:500',
-            'due' => 'nullable|date',
-            'is_completed' => 'boolean',
+            'due' => 'nullable|date|after_or_equal:today',
+            'when_completed' => 'nullable|date',
             'progress_rate' => 'nullable|integer',
             'priority' => 'nullable|string',
             // 'label' => 'nullable|string|max:25'
@@ -35,13 +35,14 @@ class TodoStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => 'タイトルは必須です。',
-            'title.string' => 'タイトルは文字列で入力してください。',
-            'title.max' => 'タイトルは50文字以内で入力してください。',
-            'description.string' => '説明は文字で入力してください。',
-            'description.max' => '説明は500文字以内でなければなりません。',
-            'due.date' => '期限は有効な日付でなければなりません。',
-            'progress_rate.integer' => '進捗率は整数でなければなりません。',
+            'title.required' => 'タイトルは必須です',
+            'title.string' => 'タイトルは文字列で入力してください',
+            'title.max' => 'タイトルは50文字以内で入力してください',
+            'description.string' => '説明は文字で入力してください',
+            'description.max' => '説明は500文字以内で入力してください',
+            'due.date' => '期限は有効な日付で入力してください',
+            'due.after_or_equal' => '期限は今日以降の日付で入力してください',
+            'progress_rate.integer' => '進捗率は整数で入力してください',
         ];
     }
 }

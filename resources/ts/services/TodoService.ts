@@ -1,34 +1,65 @@
 import axios, { AxiosResponse } from 'axios';
 import { Todo } from '../classes/Todo';
+import { UpdateTodo } from '../classes/Todo';
 
 export class TodoService {
-    // Todoを追加するメソッド(APIに渡す)
-    static async addTodo(formData: FormData): Promise<Todo> {
+    static async addTodo(formData: FormData): Promise<Todo> {//todo追加
         try {
-            // formDataを直接ボディに送信
-            const response: AxiosResponse<Todo> = await axios.post('/add_todo', formData);
-            return response.data;  // 新しいTodoを返す
+            const response: AxiosResponse<{ success: boolean, message: string, todo: Todo }> = await axios.post('/add_todo', formData);
+            return response.data.todo;
         } catch (error) {
-            // console.error('Todoの追加に失敗しました', error);
-            // throw error;
-
             if (axios.isAxiosError(error) && error.response) {
                 // バリデーションエラーの処理
                 const validationErrors = error.response.data.errors;
-                displayValidationErrors(validationErrors);
+                displayCreateValidationErrors(validationErrors);
             } else {
                 console.error('リクエスト中にエラーが発生しました', error);
             }
             throw new Error('Todoの追加に失敗しました');
         }
     }
+    //詳細表示
+    static async showTodo(todoId: string | null): Promise<Todo> {
+        try {
+            const response: AxiosResponse<{ success: boolean, todo: Todo }> = await axios.get(`/show_todo/${todoId}`);
+            return response.data.todo;
+        } catch (error) {
+            throw new Error('Todoの表示に失敗しました');
+        }
+    }
+    //編集処理
+    static async updateTodo(updateFormData: FormData): Promise<UpdateTodo> {
+        try {
+            for (const [key, value] of updateFormData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+            const todoId = updateFormData.get('id');
+            // const response = await axios.patch(`/update_todo/${todoId}`, updateFormData);→これではなぜか送信されない（nullになる）
+            const response = await axios.patch(`/update_todo/${todoId}`, updateFormData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            return response.data.todo;
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                console.error('Axios Error:', error.response?.data);
+                // バリデーションエラーの処理
+                const validationErrors = error.response.data.errors;
+                displayUpdateValidationErrors(validationErrors);
+            } else {
+                console.error('リクエスト中にエラーが発生しました', error);
+            }
+            throw new Error('Todoの更新に失敗しました');
+        }
+    }
+
+    //削除処理
 }
-function displayValidationErrors(errors: any) {
+function displayCreateValidationErrors(errors: any) {
     const errorContainer = document.getElementById('errorContainer') as HTMLElement;
     errorContainer.innerHTML = ''; //既存のエラーをクリア
-
-    // エラーメッセージを1つずつ表示
-    Object.keys(errors).forEach(field => {
+    Object.keys(errors).forEach(field => { //エラーメッセージを1つずつ表示
         const fieldErrors = errors[field];
         fieldErrors.forEach((message: string) => {
             const errorElement = document.createElement('div');
@@ -38,3 +69,18 @@ function displayValidationErrors(errors: any) {
         });
     });
 }
+
+function displayUpdateValidationErrors(errors: any) {
+    const errorContainer = document.getElementById('updateErrorContainer') as HTMLElement;
+    errorContainer.innerHTML = ''; //既存のエラーをクリア
+    Object.keys(errors).forEach(field => { //エラーメッセージを1つずつ表示
+        const fieldErrors = errors[field];
+        fieldErrors.forEach((message: string) => {
+            const errorElement = document.createElement('div');
+            errorElement.className = 'text-sm text-red-500 ml-2 mt-1';
+            errorElement.innerText = message;
+            errorContainer.appendChild(errorElement);
+        });
+    });
+}
+
