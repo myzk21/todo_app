@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            <div class="bg-white shadow-md rounded-lg w-3/4 overflow-x-auto">
+            <div class="bg-white shadow-md rounded-lg w-3/4 overflow-x-auto" id="todo_list">
                 <form action="" method="POST" class="" id="todo_create_form">
                     @csrf
 
@@ -64,15 +64,15 @@
                     </thead>
                     <tbody class="mb-3" id="todo-table">
                         @foreach($today_todos as $todo)
-                            <tr class="border-b border-gray-100">
+                            <tr class="border-b border-gray-100 todo-item" id="{{ $todo['id'] }}">
                                 <td class="px-4 py-3 text-center">
                                     <input type="checkbox" class="form-checkbox">
                                 </td>
-                                    <td class="px-4 py-3 text-center">{{ $todo['title'] }}</td>
-                                    <td class="px-4 py-3 text-center">{{ $todo['description'] ?? '--' }}</td>
-                                    <td class="px-4 py-3 text-center">{{ $todo['progress_rate'] ?? '--' }}%</td>
-                                    <td class="px-4 py-3 text-center">{{ $todo['priority'] ?? '--' }}</td>
-                                    <td class="px-4 py-3 text-center">{{ $todo['due'] ?? '--' }}</td>
+                                    <td class="px-4 py-3 text-center title">{{ $todo['title'] }}</td>
+                                    <td class="px-4 py-3 text-center description">{{ $todo['description'] ?? '--' }}</td>
+                                    <td class="px-4 py-3 text-center progress_rate">{{ $todo['progress_rate'] ?? '--' }}%</td>
+                                    <td class="px-4 py-3 text-center priority">{{ $todo['priority'] ?? '--' }}</td>
+                                    <td class="px-4 py-3 text-center due">{{ $todo['due'] ?? '--' }}</td>
                                     <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center"><a href="#" class="showBtn" todo-id="{{ $todo['id'] }}">詳細</a></td>
                                     <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
                                         <a href="#">{{--ゴミ箱アイコン--}}

@@ -45,6 +45,7 @@ class TodoController extends Controller
                           ->whereNull('when_completed');
             });
         })
+        ->orderBy('created_at', 'desc')
         ->get();
 
             // 今日のタスクと今日完了したタスクに分ける
@@ -174,7 +175,6 @@ class TodoController extends Controller
      */
     public function update(TodoUpdateRequest $request, string $id)
     {
-         //dd($request->all());//->完璧
         $todo = Todo::findOrFail($id);
         $todo->title = $request->input('updateTitle');
         $todo->description = $request->input('updateDescription');

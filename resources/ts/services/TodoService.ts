@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { Todo } from '../classes/Todo';
-import { UpdateTodo } from '../classes/Todo';
+// import { UpdateTodo } from '../classes/Todo';
 
 export class TodoService {
     static async addTodo(formData: FormData): Promise<Todo> {//todo追加
@@ -28,11 +28,11 @@ export class TodoService {
         }
     }
     //編集処理
-    static async updateTodo(updateFormData: FormData): Promise<UpdateTodo> {
+    static async updateTodo(updateFormData: FormData): Promise<Todo> {
         try {
-            for (const [key, value] of updateFormData.entries()) {
-                console.log(`${key}: ${value}`);
-            }
+            // for (const [key, value] of updateFormData.entries()) {
+            //     console.log(`${key}: ${value}`);
+            // }
             const todoId = updateFormData.get('id');
             // const response = await axios.patch(`/update_todo/${todoId}`, updateFormData);→これではなぜか送信されない（nullになる）
             const response = await axios.patch(`/update_todo/${todoId}`, updateFormData, {
