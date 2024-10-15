@@ -18,9 +18,9 @@
             <label for="priority">優先度</label>
             <select id="priority" class="rounded mr-4" name="priority">
                 <option value="">--</option>
-                <option value="high" {{ old('priority') == "high" ? 'selected' : '' }}>高</option>
-                <option value="middle" {{ old('priority') == "middle" ? 'selected' : '' }}>中</option>
-                <option value="low" {{ old('priority') == "low" ? 'selected' : '' }}>低</option>
+                <option value="高" {{ old('priority') == "高" ? 'selected' : '' }}>高</option>
+                <option value="中" {{ old('priority') == "中" ? 'selected' : '' }}>中</option>
+                <option value="低" {{ old('priority') == "低" ? 'selected' : '' }}>低</option>
             </select>
         </div>
         <div class="w-full sm:w-auto mb-4 sm:mb-0">
