@@ -9,6 +9,7 @@ export class Todo {
         public progress_rate: string | null,
         public priority: string | null,
         public label: string | null,
+        public deleted_at: Date | null,
     ) {}
 }
 // export class UpdateTodo {

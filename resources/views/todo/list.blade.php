@@ -66,25 +66,33 @@
                         @foreach($today_todos as $todo)
                             <tr class="border-b border-gray-100 todo-item" id="{{ $todo['id'] }}">
                                 <td class="px-4 py-3 text-center">
-                                    <input type="checkbox" class="form-checkbox">
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" class="hidden peer">
+                                        <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-gray-500 relative">
+                                            {{--チェックマーク--}}
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                            </svg>
+                                        </div>
+                                    </label>
                                 </td>
-                                    <td class="px-4 py-3 text-center title">{{ $todo['title'] }}</td>
-                                    <td class="px-4 py-3 text-center description">{{ $todo['description'] ?? '--' }}</td>
-                                    <td class="px-4 py-3 text-center progress_rate">{{ $todo['progress_rate'] ?? '--' }}%</td>
-                                    <td class="px-4 py-3 text-center priority">{{ $todo['priority'] ?? '--' }}</td>
-                                    <td class="px-4 py-3 text-center due">{{ $todo['due'] ?? '--' }}</td>
-                                    <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center"><a href="#" class="showBtn" todo-id="{{ $todo['id'] }}">詳細</a></td>
-                                    <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
-                                        <a href="#">{{--ゴミ箱アイコン--}}
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5 text-gray-400">
-                                                <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
-                                              </svg>
-                                        </a>
-                                    </td>
+                                <td class="px-4 py-3 text-center title">{{ \Illuminate\Support\Str::limit($todo['title'], 15, '...') }}</td>
+                                <td class="px-4 py-3 text-center description">{{ \Illuminate\Support\Str::limit($todo['description'], 15, '...') ?? '--' }}</td>
+                                <td class="px-4 py-3 text-center progress_rate">{{ $todo['progress_rate'] ?? '--' }}%</td>
+                                <td class="px-4 py-3 text-center priority">{{ $todo['priority'] ?? '--' }}</td>
+                                <td class="px-4 py-3 text-center due">{{ $todo['due'] ?? '--' }}</td>
+                                <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center"><a href="#" class="showBtn" todo-id="{{ $todo['id'] }}">詳細</a></td>
+                                <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
+                                    <a href="#" class="todo_delete_btn" todo-id="{{ $todo['id'] }}">{{--ゴミ箱アイコン--}}
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5 text-gray-400">
+                                            <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
-                    <tr>
+                    {{-- <tr>
                         <td colspan="8" class="px-4 py-4 font-bold border-b border-gray-100">本日完了したタスク</td>
                     </tr>
 
@@ -94,19 +102,26 @@
                         </tr>
                     @else
                         @foreach($completed_todos as $completed_todo)
-                            <tr class="border border-gray-100">
-                                <td class="px-4 py-3">
-                                    <input type="checkbox" class="form-checkbox" disabled checked>
+                            <tr class="border-b border-gray-100 todo-item" id="{{ $todo['id'] }}">
+                                <td class="px-4 py-3 text-center">
+                                    <input type="checkbox" class="form-checkbox">
                                 </td>
-                                <td class="px-4 py-3 text-center">{{ $completed_todo['title'] }}</td>
-                                <td class="px-4 py-3 text-center">{{ $completed_todo['description'] ?? '--' }}</td>
-                                <td class="px-4 py-3 text-center">{{ $completed_todo['progress_rate'] ?? '--' }}%</td>
-                                <td class="px-4 py-3 text-center">{{ $completed_todo['priority'] ?? '--' }}</td>
-                                <td class="px-4 py-3 text-center">{{ $completed_todo['due'] ?? '--' }}</td>
-                                <td class="px-4 py-3"></td>
+                                    <td class="px-4 py-3 text-center title">{{ \Illuminate\Support\Str::limit($todo['title'], 15) }}</td>
+                                    <td class="px-4 py-3 text-center description">{{ \Illuminate\Support\Str::limit($todo['description'] ?? '--', 15) }}</td>
+                                    <td class="px-4 py-3 text-center progress_rate">{{ $todo['progress_rate'] ?? '--' }}%</td>
+                                    <td class="px-4 py-3 text-center priority">{{ $todo['priority'] ?? '--' }}</td>
+                                    <td class="px-4 py-3 text-center due">{{ $todo['due'] ?? '--' }}</td>
+                                    <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center"><a href="#" class="showBtn" todo-id="{{ $todo['id'] }}">詳細</a></td>
+                                    <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
+                                        <a href="#"id="todo-delete">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5 text-gray-400">
+                                                <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </a>
+                                    </td>
                             </tr>
                         @endforeach
-                    @endif
+                    @endif--}}
                 </table>
             </div>
         </div>

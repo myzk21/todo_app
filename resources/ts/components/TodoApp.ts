@@ -36,7 +36,7 @@ export class TodoApp {
             this.addTodo();
         });
         this.showTodo();
-        //editTodoも作成（保存処理）
+        this.deleteTodo();
     }
 
     // Todoの追加処理
@@ -64,7 +64,14 @@ export class TodoApp {
     private renderTodo(todo: Todo) {
         let existingTodoItem = document.getElementById(`${todo.id}`) as HTMLTableRowElement;//変更したTodoを取得
         if(existingTodoItem) {
-            this.updateTodoItem(existingTodoItem, todo);
+            if (todo.deleted_at) {
+                //DOMから削除する
+                existingTodoItem.remove();
+                console.log(`Todo ID ${todo.id} が削除されました。`);
+            } else {
+                //Todoを更新
+                this.updateTodoItem(existingTodoItem, todo);
+            }
         } else {
             //新規登録(viewに追加)
             this.createTodoItem(todo);//新規で登録したばかりの状態ではまだIDを取得できないから新規扱いになって追加に登録されるー＞これを解決する
@@ -73,14 +80,6 @@ export class TodoApp {
 
     private async showTodo() {
         const todoListContainer = document.getElementById('todo_list') as HTMLElement;
-        // if (todoListContainer) {
-        //     todoListContainer.removeEventListener('click', this.todoClickHandler); // 既存のリスナーを削除
-        //     todoListContainer.addEventListener('click', this.todoClickHandler.bind(this));
-
-
-
-
-            //以下がもとのコード
             todoListContainer.addEventListener('click', async (event) => {
                 const target = event.target as HTMLElement;
                 //showBtnクラスを持つ要素がクリックされた場合
@@ -97,20 +96,6 @@ export class TodoApp {
                 }
             });
     }
-    // private async todoClickHandler(event: Event) {
-    //     const target = event.target as HTMLElement;
-    //     if (target.classList.contains('showBtn')) {
-    //         const showBtn = target as HTMLAnchorElement; //クリックされた<a>要素を取得
-    //         const todoId = showBtn.getAttribute('todo-id'); //todo-id属性を取得
-
-    //         if (todoId) {
-    //             const showTodo: Todo = await TodoService.showTodo(todoId);
-    //             this.createDetailModal(showTodo);
-    //         } else {
-    //             console.error('Todo IDが見つかりません。');
-    //         }
-    //     }
-    // }
 
     // Todoの更新処理
     private async updateTodo() {
@@ -130,6 +115,30 @@ export class TodoApp {
                 stack: error instanceof Error ? error.stack : 'スタックトレースなし',
             });
         }
+    }
+
+    //TODO削除
+    private async deleteTodo() {
+        const todoListContainer = document.getElementById('todo_list') as HTMLElement;
+            todoListContainer.addEventListener('click', async (event) => {
+                const target = event.target as HTMLElement;
+                //todo_delete_btnクラスを持つ要素がクリックされた場合
+                if (target.closest('.todo_delete_btn')) {
+                    if(!confirm('本当に削除しますか？')) return;
+                    try{
+                        const deleteBtn = target.closest('.todo_delete_btn') as HTMLAnchorElement; //クリックされた<a>要素を取得
+                        const todoId = deleteBtn.getAttribute('todo-id'); //todo-id属性を取得
+                        if (todoId) {
+                            const deleteTodo: Todo = await TodoService.deleteTodo(todoId);
+                            this.renderTodo(deleteTodo);
+                        } else {
+                            console.error('Todo IDが見つかりません。');
+                        }
+                    } catch(error) {
+                        console.error('Todoの削除に失敗しました');
+                    }
+                }
+            });
     }
 
     private createDetailModal(showTodo: Todo) {//todo作成モーダル
@@ -152,7 +161,7 @@ export class TodoApp {
                                 <label for="percentage">進捗率</label>
                                 <select id="percentage" class="rounded mr-4" name="updateProgress_rate">
                                     <option value="">--</option>
-                                    ${Array.from({ length: 11 }, (_, i) => {
+                                    ${Array.from({ length: 7 }, (_, i) => {
                                         const value = i * 10; // 0, 10, 20, ..., 100
                                         const showRateNum = showTodo.progress_rate !== null ? Number(showTodo.progress_rate) : null;
                                         const isSelected = showRateNum === value ? 'selected' : '';
@@ -176,7 +185,7 @@ export class TodoApp {
                         </div>
                         <div class="w-full flex mt-1">
                             <button class="bg-[#8b8a8e] text-white text-sm px-4 py-2 rounded ml-auto hover:bg-opacity-80 select-none flex justify-end" id="todo_update_btn">保存</button>
-                            <p class="hover:underline cursor-pointer px-4 py-2 text-gray-400 text-sm">削除</p>
+                            <p class="hover:underline cursor-pointer px-4 py-2 text-gray-400 text-sm todo_delete_btn" todo-id="${showTodo.id}"><a>削除</a></p>
                         </div>
                     </form>
                 </div>
@@ -194,6 +203,25 @@ export class TodoApp {
             event.preventDefault();
             this.updateTodo();//TODOの更新
         });
+        //詳細画面での削除
+        const deleteButton = document.querySelector('.todo_delete_btn') as HTMLElement;
+        deleteButton.addEventListener('click', async (event: MouseEvent) => {
+            // this.deleteTodo();
+            if(!confirm('本当に削除しますか？')) return;
+            try{
+                const todoId = deleteButton.getAttribute('todo-id'); //todo-id属性を取得
+                if (todoId) {
+                    const deleteTodo: Todo = await TodoService.deleteTodo(todoId);
+                    this.renderTodo(deleteTodo);
+                    //モーダルをとじる
+                    if(this.todoDetailModal)this.todoDetailModal.innerHTML = '';
+                } else {
+                    console.error('Todo IDが見つかりません。');
+                }
+            } catch(error) {
+                console.error('Todoの削除に失敗しました');
+            }
+        });
     }
 
     private updateTodoItem(existingTodoItem: HTMLTableRowElement, todo: Todo) {//todoのレイアウトを編集
@@ -203,8 +231,8 @@ export class TodoApp {
         const priority = existingTodoItem.querySelector('.priority') as HTMLSelectElement;
         const due = existingTodoItem.querySelector('.due') as HTMLInputElement;
 
-        title.textContent = todo.title;
-        description.textContent = todo.description ?? '--';
+        title.textContent = todo.title.slice(0, 7) + (todo.title.length > 7 ? '...' : '');
+        description.textContent = todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--';
         progress.textContent = `${todo.progress_rate ?? '--'}%`;
         priority.textContent = todo.priority ?? '--';
         if (todo.due) {
@@ -230,10 +258,17 @@ export class TodoApp {
         newRow.id = `${todo.id}`;
         newRow.innerHTML = `
             <td class="px-4 py-3 text-center">
-                <input type="checkbox" class="form-checkbox">
+               <label class="inline-flex items-center">
+                    <input type="checkbox" class="hidden peer">
+                    <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-gray-500 relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                    </div>
+                </label>
             </td>
-            <td class="px-4 py-3 text-center title">${todo.title}</td>
-            <td class="px-4 py-3 text-center description">${todo.description ?? '--'}</td>
+            <td class="px-4 py-3 text-center title">${todo.title.slice(0, 7) + (todo.title.length > 7 ? '...' : '')}</td>
+            <td class="px-4 py-3 text-center description">${(todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--')}</td>
             <td class="px-4 py-3 text-center progress_rate">${todo.progress_rate ?? '--'}%</td>
             <td class="px-4 py-3 text-center priority">${todo.priority ?? '--'}</td>
             <td class="px-4 py-3 text-center due">${todo.due ?? '--'}</td>
@@ -241,10 +276,10 @@ export class TodoApp {
                 <a href="#" class="showBtn" todo-id="${todo.id}">詳細</a>
             </td>
             <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
-                <a href="#">
+                <a href="#" class="todo_delete_btn" todo-id="${todo.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5 text-gray-400">
                         <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
-                        </svg>
+                    </svg>
                 </a>
             </td>
         `;
