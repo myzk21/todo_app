@@ -196,6 +196,21 @@ class TodoController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user_id = Auth::id();
+        $todo = Todo::query()
+            ->where('user_id', $user_id)
+            ->where('id', $id)
+            ->first();
+        if (!$todo) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Todoが見つかりませんでした'
+            ], 404);
+        }
+        $todo->delete();
+        return response()->json([
+            'success' => true,
+            'todo' => $todo
+        ]);
     }
 }

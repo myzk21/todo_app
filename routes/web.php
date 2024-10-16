@@ -27,6 +27,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/show_todo/{id}', [TodoController::class, 'show']);
     //TODO更新
     Route::patch('/update_todo/{id}', [TodoController::class, 'update']);
+    //TODO削除
+    Route::delete('/delete_todo/{id}', [TodoController::class, 'destroy']);
+
 });
 
 require __DIR__.'/auth.php';
