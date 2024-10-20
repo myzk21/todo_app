@@ -36,8 +36,49 @@ export class TodoApp {
             event.preventDefault();
             this.addTodo();
         });
+        this.changeTodoStatus();
         this.showTodo();
         this.deleteTodo();
+    }
+
+    //todo完了処理
+    private async changeTodoStatus() {
+        const todoListContainer = document.getElementById('todo_list') as HTMLElement;
+        todoListContainer.addEventListener('click', async (event) => {
+            const target = event.target as HTMLElement;
+            if (target.classList.contains('todo-checkbox')) {
+                const  todoContainer = target.closest('.todo-container') as HTMLTableRowElement | HTMLDivElement;
+                const title = todoContainer.querySelector('.title') as HTMLInputElement;
+                const description = todoContainer.querySelector('.description') as HTMLTextAreaElement;
+                const progress = todoContainer.querySelector('.progress_rate') as HTMLSelectElement;
+                const priority = todoContainer.querySelector('.priority') as HTMLSelectElement;
+                const due = todoContainer.querySelector('.due') as HTMLInputElement;
+
+                const todoId = todoContainer.id;
+
+                if (todoId) {
+                    const newTodoStatus: Todo = await TodoService.changeTodoStatus(todoId);
+                    if(newTodoStatus.when_completed) {
+                        todoContainer.classList.add('opacity-25');
+                        title.classList.add('line-through');
+                        description.classList.add('line-through');
+                        progress.classList.add('line-through');
+                        priority.classList.add('line-through');
+                        due.classList.add('line-through');
+                    } else {
+                        todoContainer.classList.remove('opacity-25');
+                        title.classList.remove('line-through');
+                        description.classList.remove('line-through');
+                        progress.classList.remove('line-through');
+                        priority.classList.remove('line-through');
+                        due.classList.remove('line-through');
+                    }
+                    //ここでtodo.when_completedがnullならcompletedクラスを削除ー＞そうでなけえればcompletedをつける
+                } else {
+                    console.error('Todo IDが見つかりません。');
+                }
+            }
+        });
     }
 
     // Todoの追加処理
@@ -144,7 +185,7 @@ export class TodoApp {
 
     private createDetailModal(showTodo: Todo) {//todo作成モーダル
         const modalHTML = `
-            <div class="w-full h-full z-50 fixed insert-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="w-full h-full z-50 fixed insert-0 bg-black bg-opacity-25 flex items-center justify-center">
                 <div class="px-6 pb-5 pt-3 shadow-sm w-3/5 rounded bg-white" id="">
                     <div class="pointer-events-none flex justify-end">
                         <p class="text-4xl cursor-pointer hover:opacity-60 -mb-2 pointer-events-auto inline-block" id="close-show-todo">×</p>
@@ -237,15 +278,15 @@ export class TodoApp {
         const notTodayTodosList = document.getElementById('not-today-todos-list') as HTMLElement;
         // 新しいTODO要素を作成
         const todoItem = document.createElement('div');
-        todoItem.className = 'bg-white shadow-sm rounded-lg px-6 py-4 max-w-md mx-auto my-3';
+        todoItem.className = `bg-white shadow-sm rounded-lg px-6 py-4 max-w-md mx-auto my-3 todo-container ${todo.when_completed ? 'opacity-25' : ''}`;
         todoItem.id = String(todo.id);
 
         // TODOの内容を設定
         todoItem.innerHTML = `
             <div class="w-full flex mb-2">
                 <label class="inline-flex items-center cursor-pointer -ml-2">
-                    <input type="checkbox" class="hidden peer">
-                    <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-[#8b8a8e] relative">
+                    <input type="checkbox" class="hidden peer todo-checkbox">
+                    <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-[#8b8a8e] ${todo.when_completed ? 'bg-[#8b8a8e]' : ''} relative">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                         </svg>
@@ -260,24 +301,24 @@ export class TodoApp {
             </div>
             <div class="mb-4">
                 <p class="text-gray-700 font-bold">タイトル</p>
-                <p class="text-gray-900 ml-2 title">${todo.title.slice(0, 7) + (todo.title.length > 7 ? '...' : '')}</p>
+                <p class="text-gray-900 ml-2 title ${todo.when_completed ? 'line-through' : ''}">${todo.title.slice(0, 7) + (todo.title.length > 7 ? '...' : '')}</p>
             </div>
             <div class="mb-4">
                 <p class="text-gray-700 font-bold">内容</p>
-                <p class="text-gray-900 ml-2 description">${(todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--')}</p>
+                <p class="text-gray-900 ml-2 description ${todo.when_completed ? 'line-through' : ''}">${(todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--')}</p>
             </div>
             <div class="flex justify-between">
                 <div class="">
                     <p class="text-gray-700 font-bold">進捗率</p>
-                    <p class="text-gray-900 ml-2 progress_rate">${todo.progress_rate ?? '--'}%</p>
+                    <p class="text-gray-900 ml-2 progress_rate ${todo.when_completed ? 'line-through' : ''}">${todo.progress_rate ?? '--'}%</p>
                 </div>
                 <div class="">
                     <p class="text-gray-700 font-bold">優先度</p>
-                    <p class="text-gray-900 ml-2 priority">${todo.priority ?? '--'}</p>
+                    <p class="text-gray-900 ml-2 priority ${todo.when_completed ? 'line-through' : ''}">${todo.priority ?? '--'}</p>
                 </div>
                 <div class="">
                     <p class="text-gray-700 font-bold">期日</p>
-                    <p class="text-gray-900 ml-2 due">${todo.due}</p>
+                    <p class="text-gray-900 ml-2 due ${todo.when_completed ? 'line-through' : ''}">${todo.due}</p>
                 </div>
             </div>
         `;
@@ -349,24 +390,24 @@ export class TodoApp {
     private createTodoItem(todo: Todo) {//新しいtodoのレイアウトを作成
         const todoTableBody = document.getElementById('todo-table') as HTMLElement;
         const newRow = document.createElement('tr');
-        newRow.className = 'border border-gray-100 todo-item';
+        newRow.className = `border border-gray-100 todo-item todo-container ${todo.when_completed ? 'opacity-25' : ''}`;
         newRow.id = `${todo.id}`;
         newRow.innerHTML = `
             <td class="px-4 py-3 text-center">
                <label class="inline-flex items-center">
-                    <input type="checkbox" class="hidden peer">
-                    <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-gray-500 relative">
+                    <input type="checkbox" class="hidden peer todo-checkbox">
+                    <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-gray-500  ${todo.when_completed ? 'bg-[#8b8a8e]' : ''}  relative">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                         </svg>
                     </div>
                 </label>
             </td>
-            <td class="px-4 py-3 text-center title">${todo.title.slice(0, 7) + (todo.title.length > 7 ? '...' : '')}</td>
-            <td class="px-4 py-3 text-center description">${(todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--')}</td>
-            <td class="px-4 py-3 text-center progress_rate">${todo.progress_rate ?? '--'}%</td>
-            <td class="px-4 py-3 text-center priority">${todo.priority ?? '--'}</td>
-            <td class="px-4 py-3 text-center due">${todo.due ?? '--'}</td>
+            <td class="px-4 py-3 text-center title ${todo.when_completed ? 'line-through' : ''}">${todo.title.slice(0, 7) + (todo.title.length > 7 ? '...' : '')}</td>
+            <td class="px-4 py-3 text-center description ${todo.when_completed ? 'line-through' : ''}">${(todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--')}</td>
+            <td class="px-4 py-3 text-center progress_rate ${todo.when_completed ? 'line-through' : ''}">${todo.progress_rate ?? '--'}%</td>
+            <td class="px-4 py-3 text-center priority ${todo.when_completed ? 'line-through' : ''}">${todo.priority ?? '--'}</td>
+            <td class="px-4 py-3 text-center due ${todo.when_completed ? 'line-through' : ''}">${todo.due ?? '--'}</td>
             <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
                 <a href="#" class="showBtn" todo-id="${todo.id}">詳細</a>
             </td>

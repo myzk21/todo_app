@@ -192,6 +192,22 @@ class TodoController extends Controller
         ]);
     }
 
+    public function changeTodoStatus(string $id)
+    {
+        $todo = Todo::findOrFail($id);
+        if($todo->when_completed) {
+            $todo->when_completed = null;
+        } else {
+            $todo->when_completed = Carbon::today();
+        }
+        $todo->save();
+        return response()->json([
+            'success' => true,
+            'message' => 'Todoが更新されました。',
+            'todo' => $todo
+        ]);
+    }
+
     /**
      * Remove the specified resource from storage.
      */

@@ -2,6 +2,20 @@ import axios, { AxiosResponse } from 'axios';
 import { Todo } from '../classes/Todo';
 
 export class TodoService {
+    static async changeTodoStatus(todoId: string | null): Promise<Todo> {
+        try {
+            const response: AxiosResponse<{ success: boolean, todo: Todo }> = await axios.patch(`/changeTodoStatus/${todoId}`);
+            // const response = await axios.patch(`/changeTodoStatus/${todoId}`, {
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     }
+            // });
+            return response.data.todo;
+        } catch(error){
+            throw new Error('Todoの更新に失敗しました');//この方式で書くとブラウザにエラーを表示させられる
+        }
+    }
+
     static async addTodo(formData: FormData): Promise<Todo> {//todo追加
         try {
             const response: AxiosResponse<{ success: boolean, message: string, todo: Todo }> = await axios.post('/add_todo', formData);

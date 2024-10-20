@@ -65,11 +65,11 @@
                         </thead>
                         <tbody class="mb-3" id="todo-table">
                             @foreach($today_todos as $todo)
-                                <tr class="border-b border-gray-100 todo-item" id="{{ $todo['id'] }}">
+                                <tr class="border-b border-gray-100 todo-item todo-container {{ $todo['when_completed'] ? 'opacity-25' : '' }}" id="{{ $todo['id'] }}">
                                     <td class="px-4 py-3 text-center">
                                         <label class="inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" class="hidden peer">
-                                            <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-[#8b8a8e] relative">
+                                            <input type="checkbox" class="hidden peer todo-checkbox">
+                                            <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-[#8b8a8e] {{ $todo['when_completed'] ? 'bg-[#8b8a8e]' : '' }} relative">
                                                 {{--チェックマーク--}}
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
@@ -77,11 +77,11 @@
                                             </div>
                                         </label>
                                     </td>
-                                    <td class="px-4 py-3 text-center title">{{ \Illuminate\Support\Str::limit($todo['title'], 15, '...') }}</td>
-                                    <td class="px-4 py-3 text-center description">{{ \Illuminate\Support\Str::limit($todo['description'], 15, '...') ?? '--' }}</td>
-                                    <td class="px-4 py-3 text-center progress_rate">{{ $todo['progress_rate'] ?? '--' }}%</td>
-                                    <td class="px-4 py-3 text-center priority">{{ $todo['priority'] ?? '--' }}</td>
-                                    <td class="px-4 py-3 text-center due">{{ $todo['due'] ?? '--' }}</td>
+                                    <td class="px-4 py-3 text-center title {{ $todo['when_completed'] ? 'line-through' : '' }}">{{ \Illuminate\Support\Str::limit($todo['title'], 15, '...') }}</td>
+                                    <td class="px-4 py-3 text-center description {{ $todo['when_completed'] ? 'line-through' : '' }}">{{ \Illuminate\Support\Str::limit($todo['description'], 15, '...') ?? '--' }}</td>
+                                    <td class="px-4 py-3 text-center progress_rate {{ $todo['when_completed'] ? 'line-through' : '' }}">{{ $todo['progress_rate'] ?? '--' }}%</td>
+                                    <td class="px-4 py-3 text-center priority {{ $todo['when_completed'] ? 'line-through' : '' }}">{{ $todo['priority'] ?? '--' }}</td>
+                                    <td class="px-4 py-3 text-center due {{ $todo['when_completed'] ? 'line-through' : '' }}">{{ $todo['due'] ?? '--' }}</td>
                                     <td class="px-4 py-3 text-gray-500 text-sm hover:underline text-center"><a href="#" class="showBtn" todo-id="{{ $todo['id'] }}">詳細</a></td>
                                     <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
                                         <a href="#" class="todo_delete_btn" todo-id="{{ $todo['id'] }}">{{--ゴミ箱アイコン--}}
@@ -128,18 +128,17 @@
             </div>
 
             <div class="container mx-auto col-span-1" id="not-today-todos-list">
-                {{--以下左との高さ調整--}}
                 <div class="w-full">
                     <p class="font-bold text-center">本日以外のTODO</p>
                 </div>
 
                 @if(!$not_today_todos->isEmpty())
                     @foreach($not_today_todos as $not_today_todo)
-                        <div class="bg-white shadow-sm rounded-lg px-6 py-4 max-w-md mx-auto my-3" id="{{ $not_today_todo['id'] }}">
+                        <div class="bg-white shadow-sm rounded-lg px-6 py-4 max-w-md mx-auto my-3 todo-container {{ $not_today_todo['when_completed'] ? 'opacity-25' : '' }}" id="{{ $not_today_todo['id'] }}">
                             <div class="w-full flex mb-2">
                                 <label class="inline-flex items-center cursor-pointer -ml-2">
-                                    <input type="checkbox" class="hidden peer">
-                                    <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-[#8b8a8e] relative">
+                                    <input type="checkbox" class="hidden peer todo-checkbox">
+                                    <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-[#8b8a8e] {{ $not_today_todo['when_completed'] ? 'bg-[#8b8a8e]' : '' }} relative">
                                         {{--チェックマーク--}}
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
@@ -155,24 +154,24 @@
                             </div>
                             <div class="mb-4">
                                 <p class="text-gray-700 font-bold">タイトル</p>
-                                <p class="text-gray-900 ml-2 title">{{ \Illuminate\Support\Str::limit($not_today_todo['title'], 15) }}</p>
+                                <p class="text-gray-900 ml-2 title {{ $not_today_todo['when_completed'] ? 'line-through' : '' }}">{{ \Illuminate\Support\Str::limit($not_today_todo['title'], 15) }}</p>
                             </div>
                             <div class="mb-4">
                                 <p class="text-gray-700 font-bold">内容</p>
-                                <p class="text-gray-900 ml-2 description">{{ \Illuminate\Support\Str::limit($not_today_todo['description'], 15, '...') ?? '--' }}</p>
+                                <p class="text-gray-900 ml-2 description {{ $not_today_todo['when_completed'] ? 'line-through' : '' }}">{{ \Illuminate\Support\Str::limit($not_today_todo['description'], 15, '...') ?? '--' }}</p>
                             </div>
                             <div class="flex justify-between">
                                 <div class="">
                                     <p class="text-gray-700 font-bold">進捗率</p>
-                                    <p class="text-gray-900 ml-2 progress_rate">{{ $not_today_todo['progress_rate'] ?? '--' }}%</p>
+                                    <p class="text-gray-900 ml-2 progress_rate {{ $not_today_todo['when_completed'] ? 'line-through' : '' }}">{{ $not_today_todo['progress_rate'] ?? '--' }}%</p>
                                 </div>
                                 <div class="">
                                     <p class="text-gray-700 font-bold">優先度</p>
-                                    <p class="text-gray-900 ml-2 priority">{{ $not_today_todo['priority'] ?? '--' }}</p>
+                                    <p class="text-gray-900 ml-2 priority {{ $not_today_todo['when_completed'] ? 'line-through' : '' }}">{{ $not_today_todo['priority'] ?? '--' }}</p>
                                 </div>
                                 <div class="">
                                     <p class="text-gray-700 font-bold">期日</p>
-                                    <p class="text-gray-900 ml-2 due">{{ $not_today_todo['due'] }}</p>
+                                    <p class="text-gray-900 ml-2 due {{ $not_today_todo['when_completed'] ? 'line-through' : '' }}">{{ $not_today_todo['due'] }}</p>
                                 </div>
                             </div>
                         </div>
