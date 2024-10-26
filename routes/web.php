@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Todo\TodoController;
+use App\Http\Controllers\Pdca\PdcaController;
+use App\Http\Controllers\Pdca\CheckActionController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -31,6 +33,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/delete_todo/{id}', [TodoController::class, 'destroy']);
     //TODOのステータス更新
     Route::patch('/changeTodoStatus/{id}', [TodoController::class, 'changeTodoStatus']);
+    //PDCA
+    Route::get('/pdca-cycle', [PdcaController::class, 'index'])->name('pdca');
+    //PDCA目標作成
+    Route::post('/create-pdca', [PdcaController::class, 'storeFirstGoal'])->name('pdca.create');
+    //PDCA check & action
+    Route::post('/create-check-action', [CheckActionController::class, 'store'])->name('pdca.create-check-action');
+
+
 });
 
 require __DIR__.'/auth.php';

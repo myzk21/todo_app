@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('weekly_goals', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
+            $table->unsignedBigInteger('user_id');
+            $table->string('title');
             $table->date('due');
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

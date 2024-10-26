@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'TODO-PDCA') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -13,12 +13,16 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @vite('resources/ts/app.ts'){{--フロントエンドの処理ファイル--}}
+        @if (View::hasSection('load-vite-todo-script'))
+            @vite('resources/ts/todo/app.ts'){{--todo関係のTS処理ファイル--}}
+        @endif
+        @if (View::hasSection('load-vite-pdca-script'))
+            @vite('resources/ts/pdca/app.ts'){{--todo関係のTS処理ファイル--}}
+        @endif
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-[#f9fafb]">
             @include('layouts.header')
-            {{-- @include('todo.components.edit_form')編集のモーダルウィンドウ --}}
             <div id="todo_detail_modal">
                 {{--ここにtodoの詳細をTSで表示--}}
             </div>
