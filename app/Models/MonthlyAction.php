@@ -11,7 +11,6 @@ class MonthlyAction extends Model
 
     protected $fillable = [
         'monthly_goal_id',
-        'monthly_check_id',
         'description',
     ];
 }

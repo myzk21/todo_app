@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('review');//整数のみ
             $table->text('description')->nullable();
             $table->timestamps();
-            $table->foreign('weekly_goal_id')->references('id')->on('labels')->onDelete('cascade');
+            $table->foreign('weekly_goal_id')->references('id')->on('weekly_goals')->onDelete('cascade');
         });
     }
 

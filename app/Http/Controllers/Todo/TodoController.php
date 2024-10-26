@@ -77,7 +77,6 @@ class TodoController extends Controller
             ->where('user_id', $user_id)
             ->orderBy('created_at', 'desc')
             ->first();
-
             return view('todo.list', compact('today_todos', 'not_today_todos', 'weeklyGoal', 'monthlyGoal'));
 
 
@@ -144,7 +143,6 @@ class TodoController extends Controller
         // $todo->label = $posts['label'];
         $todo->save();
 
-        // return redirect()->route('home')->with('success', 'Todoが追加されました。');
         return response()->json([
             'success' => true,
             'message' => 'Todoが追加されました。',

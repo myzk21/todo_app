@@ -14,11 +14,9 @@ return new class extends Migration
         Schema::create('weekly_actions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('weekly_goal_id');
-            $table->unsignedBigInteger('weekly_check_id');
             $table->text('description');
             $table->timestamps();
-            $table->foreign('weekly_goal_id')->references('id')->on('labels')->onDelete('cascade');
-            $table->foreign('weekly_check_id')->references('id')->on('labels')->onDelete('cascade');
+            $table->foreign('weekly_goal_id')->references('id')->on('weekly_goals')->onDelete('cascade');
         });
     }
 

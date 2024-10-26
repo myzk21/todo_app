@@ -9,6 +9,7 @@ use App\Http\Requests\Pdca\CreateFirstGoalRequest;
 use App\Models\WeeklyGoal;
 use App\Models\MonthlyGoal;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class PdcaController extends Controller
 {
@@ -24,12 +25,12 @@ class PdcaController extends Controller
         ->with('monthlyCheck', 'monthlyAction')
         ->orderBy('created_at', 'desc')
         ->first();
-
         return view('pdca.home', compact('weeklyGoal', 'monthlyGoal'));
     }
 
-    public function storeFirstGoal(CreateFirstGoalRequest $request) {
+    public function storeFirstGoal(CreateFirstGoalRequest $request) {//初回の目標登録
         try {
+            DB::beginTransaction();
             $posts = $request->validated();
             $weeklyGoal = new WeeklyGoal();
             $weeklyGoal->user_id = Auth::id();
@@ -39,11 +40,15 @@ class PdcaController extends Controller
 
             $monthlyGoal = new MonthlyGoal();
             $monthlyGoal->user_id = Auth::id();
-            $monthlyGoal->title =$posts['monthly-goal'];
+            $monthlyGoal->title = $posts['monthly-goal'];
             $monthlyGoal->due= Carbon::now()->endOfMonth();//今月末
             $monthlyGoal->save();
-            return view('todo.list', compact('weeklyGoal', 'monthlyGoal'));
+
+            DB::commit();
+            return redirect()->route('home');
         } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'データの保存に失敗しました');
             // dd($e->getMessage());
         }
     }
