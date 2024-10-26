@@ -18,13 +18,13 @@ class GoalController extends Controller
         try {
             DB::beginTransaction();
             $posts = $request->validated();
-            if($posts['weekly_goal']) {
+            if($request->input('weekly_goal')) {
                 $weeklyGoal = new WeeklyGoal();
                 $weeklyGoal->user_id = Auth::id();
                 $weeklyGoal->title = $posts['weekly_goal'];
                 $weeklyGoal->due = Carbon::now()->endOfWeek(Carbon::SUNDAY);
                 $weeklyGoal->save();
-            } elseif($posts['monthly_goal']) {
+            } elseif($request->input('monthly_goal')) {
                 $monthlyGoal = new MonthlyGoal();
                 $monthlyGoal->user_id = Auth::id();
                 $monthlyGoal->title = $posts['monthly_goal'];
@@ -34,7 +34,7 @@ class GoalController extends Controller
             DB::commit();
             return redirect()->route('home');
         } catch (\Exception $e) {
-            // dd($e);
+            dd($e);
             DB::rollback();
             return redirect()->back()->with('error', 'データの保存に失敗しました');
         }
