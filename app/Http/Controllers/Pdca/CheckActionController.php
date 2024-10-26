@@ -24,31 +24,33 @@ class CheckActionController extends Controller
             if($weeklyGoalId) { //週間目標の振り返り保存
                 $weeklyCheck = new WeeklyCheck();
                 $weeklyCheck->weekly_goal_id = $weeklyGoalId;
-                $weeklyCheck->review = (int) $posts['check-rating'];
-                $weeklyCheck->description = $posts['check-description'];
+                $weeklyCheck->review = (int) $posts['weekly_check_rating'];
+                $weeklyCheck->description = $posts['weekly_check_description'];
                 $weeklyCheck->save();
                 $weeklyAction = new WeeklyAction();
                 $weeklyAction->weekly_goal_id = $weeklyGoalId;
-                $weeklyAction->description = $posts['action-description'];
+                $weeklyAction->description = $posts['weekly_action_description'];
                 $weeklyAction->save();
+                $activeTab = 'weekly';
             } elseif($monthlyGoalId) {//月間の振り返り
                 $monthlyCheck = new MonthlyCheck();
                 $monthlyCheck->monthly_goal_id = $monthlyGoalId;
-                $monthlyCheck->review = $posts['check-rating'];
-                $monthlyCheck->description = $posts['check-description'];
+                $monthlyCheck->review = $posts['monthly_check_rating'];
+                $monthlyCheck->description = $posts['monthly_check_description'];
                 $monthlyCheck->save();
 
                 $monthlyAction = new MonthlyAction();
                 $monthlyAction->monthly_goal_id = $monthlyGoalId;
-                $monthlyAction->description = $posts['action-description'];
+                $monthlyAction->description = $posts['monthly_action_description'];
                 $monthlyAction->save();
+                $activeTab = 'monthly';
             }
             DB::commit();
-            return redirect()->back();
+            return redirect()->back()->with('activeTab', $activeTab ?? 'weekly');
         } catch (\Exception $e) {
-            dd($e);
+            // dd($e);
             DB::rollback();
-            return redirect()->back()->with('error', 'データの保存に失敗しました');
+            return redirect()->back()->withInput()->withErrors(['error' => 'データの保存に失敗しました'])->with('activeTab', $activeTab ?? 'weekly');
         }
     }
     public function update(CheckActionRequest $request, $check_id, $action_id) {
@@ -61,32 +63,30 @@ class CheckActionController extends Controller
 
             if($weeklyGoalId) { //週間目標の振り返り保存
                 $weeklyCheck = WeeklyCheck::find($check_id);
-                // $weeklyCheck->weekly_goal_id = $weeklyGoalId;
-                $weeklyCheck->review = (int) $posts['check-rating'];
-                $weeklyCheck->description = $posts['check-description'];
+                $weeklyCheck->review = (int) $posts['weekly_check_rating'];
+                $weeklyCheck->description = $posts['weekly_check_description'];
                 $weeklyCheck->save();
                 $weeklyAction = WeeklyAction::find($action_id);
-                // $weeklyAction->weekly_goal_id = $weeklyGoalId;
-                $weeklyAction->description = $posts['action-description'];
+                $weeklyAction->description = $posts['weekly_action_description'];
                 $weeklyAction->save();
+                $activeTab = 'weekly';
             } elseif($monthlyGoalId) {//月間の振り返り
                 $monthlyCheck = MonthlyCheck::find($check_id);
-                // $monthlyCheck->monthly_goal_id = $monthlyGoalId;
-                $monthlyCheck->review = $posts['check-rating'];
-                $monthlyCheck->description = $posts['check-description'];
+                $monthlyCheck->review = $posts['monthly_check_rating'];
+                $monthlyCheck->description = $posts['monthly_check_description'];
                 $monthlyCheck->save();
 
                 $monthlyAction = MonthlyAction::find($action_id);
-                // $monthlyAction->monthly_goal_id = $monthlyGoalId;
-                $monthlyAction->description = $posts['action-description'];
+                $monthlyAction->description = $posts['monthly_action_description'];
                 $monthlyAction->save();
+                $activeTab = 'monthly';
             }
             DB::commit();
-            return redirect()->back();
+            return redirect()->back()->with('activeTab', $activeTab ?? 'weekly');
         } catch (\Exception $e) {
-            dd($e);
+            // dd($e);
             DB::rollback();
-            return redirect()->back()->with('error', 'データの保存に失敗しました');
+            return redirect()->back()->withInput()->withErrors(['error' => 'データの保存に失敗しました'])->with('activeTab', $activeTab ?? 'weekly');
         }
     }
 }
