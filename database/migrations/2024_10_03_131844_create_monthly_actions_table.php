@@ -14,11 +14,9 @@ return new class extends Migration
         Schema::create('monthly_actions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('monthly_goal_id');
-            $table->unsignedBigInteger('monthly_check_id');
             $table->text('description');
             $table->timestamps();
-            $table->foreign('monthly_goal_id')->references('id')->on('labels')->onDelete('cascade');
-            $table->foreign('monthly_check_id')->references('id')->on('labels')->onDelete('cascade');
+            $table->foreign('monthly_goal_id')->references('id')->on('monthly_goals')->onDelete('cascade');
         });
     }
 

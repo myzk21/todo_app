@@ -11,7 +11,6 @@ class WeeklyAction extends Model
 
     protected $fillable = [
         'weekly_goal_id',
-        'weekly_check_id',
         'description',
     ];
 }

@@ -9,6 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let rating = 0;
 
     const ratingInput = document.getElementById('rating') as HTMLInputElement | null;
+    if(ratingInput) {
+        rating =  Number(ratingInput.value);
+        stars.forEach((star, index) => {
+            if(index < rating) {
+                star.setAttribute('fill', 'orange');
+            }
+        });
+    }
 
     stars.forEach((star, index) => {
         //星をクリックしたときのイベントハンドラ
