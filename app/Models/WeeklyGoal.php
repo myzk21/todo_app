@@ -10,8 +10,14 @@ class WeeklyGoal extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'description',
+        'user_id',
+        'title',
         'due',
     ];
+    public function weeklyCheck() {
+        return $this->hasOne(WeeklyCheck::class);
+    }
+    public function weeklyAction() {
+        return $this->hasOne(WeeklyAction::class);
+    }
 }

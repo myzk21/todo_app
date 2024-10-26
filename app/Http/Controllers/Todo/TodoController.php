@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\TodoStoreRequest;
 use App\Http\Requests\TodoUpdateRequest;
 use Carbon\Carbon;
+use App\Models\WeeklyGoal;
+use App\Models\MonthlyGoal;
 
 class TodoController extends Controller
 {
@@ -67,13 +69,16 @@ class TodoController extends Controller
                 return $todo->due; // 期日で並べ替え
             });
 
-            // 今日完了したタスクをフィルター
-            // $completed_todos = $all_todos
-            // ->filter(function ($todo) {
-            //     return !is_null($todo->when_completed) && Carbon::parse($todo->when_completed)->isToday();
-            // });
-            // ビューにデータを渡す
-            return view('todo.list', compact('today_todos', 'not_today_todos'));
+            $weeklyGoal = WeeklyGoal::query()
+            ->where('user_id', $user_id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+            $monthlyGoal = MonthlyGoal::query()
+            ->where('user_id', $user_id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+            return view('todo.list', compact('today_todos', 'not_today_todos', 'weeklyGoal', 'monthlyGoal'));
 
 
 
@@ -127,7 +132,7 @@ class TodoController extends Controller
      */
     public function store(TodoStoreRequest $request)
     {
-        $posts = $request->all();
+        $posts = $request->validated();
         $todo = new Todo();
         $todo->user_id = Auth::id();
         $todo->title = $posts['title'];

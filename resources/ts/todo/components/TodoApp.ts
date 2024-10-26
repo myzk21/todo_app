@@ -185,7 +185,7 @@ export class TodoApp {
 
     private createDetailModal(showTodo: Todo) {//todo作成モーダル
         const modalHTML = `
-            <div class="w-full h-full z-50 fixed insert-0 bg-black bg-opacity-25 flex items-center justify-center">
+            <div class="w-full h-full z-50 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                 <div class="px-6 pb-5 pt-3 shadow-sm w-3/5 rounded bg-white" id="">
                     <div class="pointer-events-none flex justify-end">
                         <p class="text-4xl cursor-pointer hover:opacity-60 -mb-2 pointer-events-auto inline-block" id="close-show-todo">×</p>

@@ -10,8 +10,14 @@ class MonthlyGoal extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'description',
+        'user_id',
+        'title',
         'due',
     ];
+    public function monthlyCheck() {
+        return $this->hasOne(MonthlyCheck::class);
+    }
+    public function monthlyAction() {
+        return $this->hasOne(MonthlyAction::class);
+    }
 }
