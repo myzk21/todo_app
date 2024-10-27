@@ -12,7 +12,8 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
-                'resources/ts/todo_list/app.ts',
+                'resources/ts/todo/app.ts',
+                'resources/ts/pdca/app.ts',
             ],
             refresh: true,
         }),
