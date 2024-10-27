@@ -40,8 +40,8 @@ class TodoStoreRequest extends FormRequest
             'title.max' => 'タイトルは50文字以内で入力してください',
             'description.string' => '説明は文字で入力してください',
             'description.max' => '説明は500文字以内で入力してください',
-            'due.date' => '期限は有効な日付で入力してください',
-            'due.after_or_equal' => '期限は今日以降の日付で入力してください',
+            'due.date' => '期日は有効な日付で入力してください',
+            'due.after_or_equal' => '期日は今日以降の日付で入力してください',
             'progress_rate.integer' => '進捗率は整数で入力してください',
         ];
     }
