@@ -39,8 +39,8 @@ class TodoUpdateRequest extends FormRequest
             'updateTitle.max' => 'タイトルは50文字以内で入力してください',
             'updateDescription.string' => '説明は文字で入力してください',
             'updateDescription.max' => '説明は500文字以内で入力してください',
-            'updateDue.date' => '期限は有効な日付で入力してください',
-            'updateDue.after_or_equal' => '期限は今日以降の日付で入力してください',
+            'updateDue.date' => '期日は有効な日付で入力してください',
+            'updateDue.after_or_equal' => '期日は今日以降の日付で入力してください',
             'updateProgress_rate.integer' => '進捗率は整数で入力してください',
         ];
     }

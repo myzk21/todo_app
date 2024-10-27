@@ -267,7 +267,6 @@ export class TodoApp {
 
     private isTodaysTodo(existingTodoItem: HTMLTableRowElement | HTMLDivElement) {//変更するTODOの場所を特定(本日か本日じゃないか)
         const parent = existingTodoItem.parentElement;
-
         if (parent && parent.id === 'todo-table') {
             return true;
         }
@@ -322,17 +321,17 @@ export class TodoApp {
                 </div>
             </div>
         `;
-        //サイドに期日順に挿入　ここから
+        //サイドに期日順に挿入
         const todos = Array.from(notTodayTodosList.children);
         let inserted = false;
 
         todos.forEach((existingTodo) => {
             const dueText = existingTodo.querySelector('.due')?.textContent;
             const existingDue = dueText ? new Date(dueText) : null;
-            if(!existingDue) {
+            if(!existingDue) {//サイドに元々なかったらそのまま追加
                 notTodayTodosList.appendChild(todoItem);
             } else if (dueDate < existingDue && !inserted) {//insertedを使用することでもしdueDateよりも後の既存のTODOが複数あった場合にループで何回も追加されないようにする→一度追加したらinsertedがtrueになるから
-                console.log(existingTodo);
+                // console.log(existingTodo);
                 notTodayTodosList.insertBefore(todoItem, existingTodo);
                 inserted = true;
             }
@@ -364,23 +363,31 @@ export class TodoApp {
             today.setHours(0, 0, 0, 0);//時間を無視するために0にする
 
             if(this.isTodaysTodo(existingTodoItem) && dueDate.getTime() > today.getTime()) {//変更するTODOが本日のタスク&&期日が今日より遅い
+                // console.log('1');
                 existingTodoItem.remove();
                 this.createNotTodayTodoItem(todo, dueDate);//サイドに順番通りに表示
+                return;
             } else if(this.isTodaysTodo(existingTodoItem) && dueDate.getTime() === today.getTime()) {//期日が今日の場合
+                // console.log('2');
                 due.textContent = todo.due;
+                return;
             }
             if(!this.isTodaysTodo(existingTodoItem) && dueDate.getTime() === today.getTime()) {//既存がサイドにある＋期日本日に変更
+                // console.log('3');
                 existingTodoItem.remove();
-                console.log('hello world');
                 this.createTodoItem(todo);//本日の方に追加
+                return;
             } else if(!this.isTodaysTodo(existingTodoItem) && dueDate.getTime() > today.getTime()) {//既存がサイド＋期日今日より遅い
+                // console.log('4');
                 existingTodoItem.remove();
                 this.createNotTodayTodoItem(todo, dueDate);//サイドに順番通りに表示
+                return;
             }
         } else {
-            if(!this.isTodaysTodo(existingTodoItem)) {//変更対象が本日のTODOじゃない時
+            if(!this.isTodaysTodo(existingTodoItem)) {//変更対象がサイドにある場合
                 existingTodoItem.remove();
                 this.createTodoItem(todo);//本日の方に追加
+                return;
             } else {
                 due.textContent = '--';
             }
@@ -419,6 +426,18 @@ export class TodoApp {
                 </a>
             </td>
         `;
+
+        if(todo.due) {
+            const dueDate = new Date(todo.due); //todo.dueをDate型に変換
+            dueDate.setHours(0, 0, 0, 0);
+            const today = new Date(); //今日の日付を取得
+            today.setHours(0, 0, 0, 0);//時間を無視するために0にする
+
+            if(dueDate > today) {
+                this.createNotTodayTodoItem(todo, dueDate);//もし期日が今日以降ならサイドに表示
+                return;
+            }
+        }
         todoTableBody.insertBefore(newRow, todoTableBody.firstChild);//todoTableBodyの一番上に追加
     }
 }

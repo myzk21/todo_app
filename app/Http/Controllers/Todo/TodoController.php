@@ -11,111 +11,55 @@ use App\Http\Requests\TodoUpdateRequest;
 use Carbon\Carbon;
 use App\Models\WeeklyGoal;
 use App\Models\MonthlyGoal;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class TodoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user_id = Auth::id();
 
         $all_todos = Todo::query()
         ->where('user_id', $user_id)
-        // ->where(function ($query) {
-        //     $query->where(function ($subQuery) {//期日が今日でまだ完了していないタスク
-        //         $subQuery->whereDate('due', Carbon::today())
-        //                  ->whereNull('when_completed');
-        //     })
-        //     ->orWhere(function ($subQuery) {//期日はないが作成されたのが今日のタスク
-        //         $subQuery->whereNull('due')
-        //                  ->whereDate('created_at', Carbon::today())
-        //                  ->whereNull('when_completed');
-        //     })
-        //     ->orWhere(function ($subQuery) {//今日完了したタスク
-        //         $subQuery->whereNotNull('when_completed')
-        //                  ->whereDate('when_completed', Carbon::today());
-        //     })
-        //     ->orWhere(function ($subQuery) {//期日が今日以外でまだ完了していないタスク
-        //         $subQuery->whereDate('due', '!=', Carbon::today())
-        //                   ->whereNull('when_completed');
-        //     })
-        //     ->orWhere(function ($subQuery) {//期日はないが今日以外に作成された未完了のタスク
-        //         $subQuery->whereNull('due')
-        //                   ->whereDate('created_at', '!=', Carbon::today())
-        //                   ->whereNull('when_completed');
-        //     });
-        // })
         ->orderBy('created_at', 'desc')
         ->get();
+        //メインに表示
+        //期日なしー＞未完了＋完了したのが今日
+        //期日ありー＞未完了＋期日が今日＋完了したのが今日+期限切れ
+        $today_todos = $all_todos->filter(function ($todo) {
+            $dueDate = Carbon::parse($todo->due);
+            $completedDate = Carbon::parse($todo->when_completed);
+            return (is_null($todo->when_completed) && $dueDate->isToday()) || //未完了で期日が今日
+                    ($completedDate->isToday() && is_null($todo->due)) || //今日完了したが期日がない
+                    (is_null($todo->when_completed) && is_null($todo->due)) || //期日なしかつ未完了
+                    (is_null($todo->when_completed) && $dueDate->isPast()) || //未完了で遅れたタスク
+                    ($dueDate->isPast() && $completedDate->isToday()) || //遅れたタスク＋今日完了したもの
+                    ($dueDate->isToday() && $completedDate->isToday()); //期日が今日かつ今日完了
+        });
+        //期日が今日以外のTodo
+        //期日あり＋未完了で期日が今日以外＋期日今日以外で完了したのが今日
+        $not_today_todos = $all_todos->filter(function ($todo) {
+            $dueDate = Carbon::parse($todo->due);
+            $completedDate = Carbon::parse($todo->when_completed);
+            return
+            $dueDate->isFuture() && //期日が今日以降
+            (is_null($todo->when_completed) || $completedDate->isToday());//期日が今日以降かつ未完了or今日完了した
+        })->sortBy(function ($todo) {
+            return $todo->due; // 期日で並べ替え
+        });
 
-            //メインに表示
-            //期日なしー＞未完了＋完了したのが今日
-            //期日ありー＞未完了で期日が今日＋完了したのが今日
-            $today_todos = $all_todos->filter(function ($todo) {
-                return (is_null($todo->when_completed) && Carbon::parse($todo->due)->isToday()) || //未完了で期日が今日
-                       (Carbon::parse($todo->when_completed)->isToday() && is_null($todo->due)) || //今日完了したが期日がない
-                       (is_null($todo->when_completed) && is_null($todo->due)) || //期日なしかつ未完了
-                       (Carbon::parse($todo->due)->isToday() && Carbon::parse($todo->when_completed)->isToday()); //期日が今日かつ完了したのも今日
-            });
-            //期日が今日以外のTodo
-            //期日あり＋未完了で期日が今日以外＋期日今日以外で完了したのが今日
-            $not_today_todos = $all_todos->filter(function ($todo) {
-                return
-                !Carbon::parse($todo->due)->isToday() && //期日が今日の日付でない
-                (is_null($todo->when_completed) || Carbon::parse($todo->when_completed)->isToday());//期日が今日以外かつ未完了or今日完了した
-            })->sortBy(function ($todo) {
-                return $todo->due; // 期日で並べ替え
-            });
-
-            $weeklyGoal = WeeklyGoal::query()
-            ->where('user_id', $user_id)
-            ->orderBy('created_at', 'desc')
-            ->first();
-            $monthlyGoal = MonthlyGoal::query()
-            ->where('user_id', $user_id)
-            ->orderBy('created_at', 'desc')
-            ->first();
-            return view('todo.list', compact('today_todos', 'not_today_todos', 'weeklyGoal', 'monthlyGoal'));
-
-
-
-//ここから下がもとのコード
-        // $baseQuery = Todo::query()->where('user_id', $user_id);
-        // $today_todos = $baseQuery->where(function ($query) {
-        //     //期日が今日かつwhen_completedがnull
-        //         $query->whereDate('due', Carbon::today())
-        //             ->whereNull('when_completed');
-        //     })
-        //     ->orWhere(function ($query) {
-        //         //期日がnullかつcreated_atが今日かつwhen_completedがnull
-        //         $query->whereNull('due')
-        //             ->whereDate('created_at', Carbon::today())
-        //             ->whereNull('when_completed');
-        //     })
-        //     ->get();
-
-        // // $completed_todos = $baseQuery->where('when_completed', Carbon::today())->get();
-        // $completed_todos = $baseQuery//今日完了したタスク
-        //     ->whereNotNull('when_completed')
-        //     ->whereDate('when_completed', Carbon::today())
-        //     ->get();
-        //     dd($completed_todos);
-
-        // $not_today_todos = $baseQuery->where(function ($query) {
-        //     $query->where(function ($subQuery) {
-        //         $subQuery->whereDate('due', '!=', Carbon::today())//dueが今日以外
-        //                   ->whereNull('when_completed'); //かつwhen_completedがnull
-        //     })
-        //     ->orWhere(function ($subQuery) {
-        //         $subQuery->whereNull('due') //かつdueがnull
-        //                   ->whereDate('created_at', '!=', Carbon::today()) //created_atが今日以外
-        //                   ->whereNull('when_completed'); //かつwhen_completedがnull
-        //     });
-        // })->get();
-
-        // return view('list', compact('today_todos', 'completed_todos', 'not_today_todos'));
+        $weeklyGoal = WeeklyGoal::query()
+        ->where('user_id', $user_id)
+        ->orderBy('created_at', 'desc')
+        ->first();
+        $monthlyGoal = MonthlyGoal::query()
+        ->where('user_id', $user_id)
+        ->orderBy('created_at', 'desc')
+        ->first();
+        return view('todo.list', compact('today_todos', 'not_today_todos', 'weeklyGoal', 'monthlyGoal'));
     }
 
     /**
@@ -183,7 +127,6 @@ class TodoController extends Controller
         $todo->title = $request->input('updateTitle');
         $todo->description = $request->input('updateDescription');
         $todo->due = $request->input('updateDue');
-        $todo->when_completed = $request->input('when_completed');
         $todo->progress_rate = $request->input('updateProgress_rate');
         $todo->priority = $request->input('updatePriority');
         $todo->save();
