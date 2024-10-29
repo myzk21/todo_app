@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // HTTPSリダイレクトを強制
+        if ($this->app->environment()) {
+            URL::forceScheme('https');
+        }
     }
 }
