@@ -106,7 +106,7 @@
                                     </tr>
                                 @endforeach
                             @else
-                                <tr class="border border-gray-100">
+                                <tr class="border border-gray-100" id="first-today-todo-message">
                                     <td colspan="8" class="px-4 py-3 text-gray-400 text-sm text-center select-none">本日のTODOはまだありません</td>
                                 </tr>
                             @endif
@@ -171,8 +171,8 @@
                         </div> --}}
                     </div>
                 @else
-                    <div class="w-full mt-3 bg-white p-6 rounded-lg shadow-sm">
-                        <p class="text-gray-400 text-center text-sm">本日以外のTODOはありません</p>
+                    <div class="w-full mt-3 bg-white p-6 rounded-lg shadow-sm" id="not-today-todos-list">
+                        <p class="text-gray-400 text-center text-sm" id="first-message">本日以外のTODOはありません</p>
                     </div>
                 @endif
             </div>

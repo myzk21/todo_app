@@ -338,7 +338,9 @@ export class TodoApp {
         });
         // もし適切な場所がなければ最後に追加
         if (!inserted) {
-            notTodayTodosList.appendChild(todoItem);
+            const firstMessage = document.getElementById('first-message');
+            if(firstMessage) firstMessage.remove();//初期メッセージを削除
+            notTodayTodosList.appendChild(todoItem);//一番最初のタスク
         }
     }
 
@@ -438,6 +440,8 @@ export class TodoApp {
                 return;
             }
         }
+        const firstTodayMessage = document.getElementById('first-today-todo-message');
+        if(firstTodayMessage) firstTodayMessage.remove();//初期メッセージを削除
         todoTableBody.insertBefore(newRow, todoTableBody.firstChild);//todoTableBodyの一番上に追加
     }
 }
