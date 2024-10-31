@@ -2,18 +2,20 @@
     @section('load-vite-todo-script', true) {{--TODOに関するTSを使用--}}
 
     <section class="bg-gray-50 px-8 py-5">
-        @if($weeklyGoal->due < now()->format('Y-m-d') && $monthlyGoal->due < now()->format('Y-m-d'))
-            <div id="notice" class="text-red-500">
-                新しい週間目標、月間目標を設定しましょう
-            </div>
-        @elseif($weeklyGoal->due < now()->format('Y-m-d'))
-            <div id="notice" class="text-red-500">
-                新しい週間目標を設定しましょう
-            </div>
-        @elseif($monthlyGoal->due < now()->format('Y-m-d'))
-            <div id="notice" class="text-red-500">
-                新しい月間目標を設定しましょう
-            </div>
+        @if($weeklyGoal && $monthlyGoal)
+            @if($weeklyGoal->due < now()->format('Y-m-d') && $monthlyGoal->due < now()->format('Y-m-d'))
+                <div id="notice" class="text-red-500">
+                    新しい週間目標、月間目標を設定しましょう
+                </div>
+            @elseif($weeklyGoal->due < now()->format('Y-m-d'))
+                <div id="notice" class="text-red-500">
+                    新しい週間目標を設定しましょう
+                </div>
+            @elseif($monthlyGoal->due < now()->format('Y-m-d'))
+                <div id="notice" class="text-red-500">
+                    新しい月間目標を設定しましょう
+                </div>
+            @endif
         @endif
         <div class="grid grid-cols-3 gap-5"  id="todo_list">
             <div class="container mx-auto col-span-2">
