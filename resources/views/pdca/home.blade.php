@@ -8,15 +8,15 @@
         <div class="mx-auto px-8 py-4">
             @if($weeklyGoal->due < now()->format('Y-m-d') && $monthlyGoal->due < now()->format('Y-m-d'))
                 <div id="notice" class="text-red-500">
-                    週間目標、月間目標の振り返りをしましょう
+                    新しい週間目標、月間目標を設定しましょう
                 </div>
             @elseif($weeklyGoal->due < now()->format('Y-m-d'))
                 <div id="notice" class="text-red-500">
-                    週間目標の振り返りをしましょう
+                    新しい週間目標を設定しましょう
                 </div>
             @elseif($monthlyGoal->due < now()->format('Y-m-d'))
                 <div id="notice" class="text-red-500">
-                    月間目標の振り返りをしましょう
+                    新しい月間目標を設定しましょう
                 </div>
             @endif
             <div class="">
@@ -70,7 +70,7 @@
                 <div class="bg-white shadow-md rounded p-6 mb-6 {{ (!$weeklyGoal->weeklyCheck || !$weeklyGoal->weeklyAction) ? 'opacity-40' : '' }}">
                     <div class="mb-1">
                         @if(!$weeklyGoal->weeklyCheck || !$weeklyGoal->weeklyAction)
-                            <p class="opacity-100 z-10 text-right underline select-none">目標の振り返りをしてください</p>
+                            <p class="text-red-500 mb-2 underline select-none">目標の振り返りをしてください</p>
                         @endif
                         <label class="block text-gray-700 text-xl font-semibold mb-1" for="next">週間目標 / Plan</label>
                         <form action="{{ route('pdca.create-goal') }}" method="POST">
@@ -133,7 +133,7 @@
                 <div class="bg-white shadow-md rounded p-6 mb-6 {{ (!$monthlyGoal->monthlyCheck || !$monthlyGoal->monthlyAction) ? 'opacity-40' : '' }}">
                     <div class="mb-1">
                         @if(!$monthlyGoal->monthlyCheck || !$monthlyGoal->monthlyAction)
-                            <p class="opacity-100 z-10 text-right underline select-none">目標の振り返りをしてください</p>
+                            <p class="text-red-500 mb-2 underline select-none">目標の振り返りをしてください</p>
                         @endif
                         <label class="block text-gray-700 text-xl font-semibold mb-1" for="next">月間目標 / Plan</label>
                         <form action="{{ route('pdca.create-goal') }}" method="POST">

@@ -2,6 +2,19 @@
     @section('load-vite-todo-script', true) {{--TODOに関するTSを使用--}}
 
     <section class="bg-gray-50 px-8 py-5">
+        @if($weeklyGoal->due < now()->format('Y-m-d') && $monthlyGoal->due < now()->format('Y-m-d'))
+            <div id="notice" class="text-red-500">
+                新しい週間目標、月間目標を設定しましょう
+            </div>
+        @elseif($weeklyGoal->due < now()->format('Y-m-d'))
+            <div id="notice" class="text-red-500">
+                新しい週間目標を設定しましょう
+            </div>
+        @elseif($monthlyGoal->due < now()->format('Y-m-d'))
+            <div id="notice" class="text-red-500">
+                新しい月間目標を設定しましょう
+            </div>
+        @endif
         <div class="grid grid-cols-3 gap-5"  id="todo_list">
             <div class="container mx-auto col-span-2">
                 <label class="toggle-switch inline-block">
@@ -15,12 +28,12 @@
                 <div class="w-full mb-6 bg-white px-6 py-3">
                     <div class="flex mb-1">
                         <h2 class="text-xl font-bold">Weekly Goal / 週間目標</h2>
-                        <a href="{{route('pdca')}}" class="ml-auto cursor-pointer text-gray-400 text-sm flex hover:underline select-none">作成
+                        <a href="{{route('pdca')}}" class="ml-auto cursor-pointer text-gray-500 text-sm flex hover:underline select-none">作成
                         </a>
                     </div>
                     @if($weeklyGoal)
                         <p class="text-gray-700">{{ $weeklyGoal['title'] }}</p>
-                        <p class="text-sm text-gray-400 underline text-right">期日: {{ $weeklyGoal['due'] }}</p>
+                        <p class="text-sm text-gray-700 underline text-right">期日: {{ $weeklyGoal['due'] }}</p>
                     @else
                         <p class="text-gray-700">週間目標はまだ設定されていません</p>
                     @endif
@@ -29,12 +42,12 @@
                         <div class="border border-gray-200 my-4"></div>
                         <div class="flex mb-1">
                             <h2 class="text-xl font-bold">Monthly Goal / 月間目標</h2>
-                            <a href="{{route('pdca')}}" class="ml-auto cursor-pointer text-gray-400 text-sm flex hover:underline select-none">作成
+                            <a href="{{route('pdca')}}" class="ml-auto cursor-pointer text-gray-500 text-sm flex hover:underline select-none">作成
                             </a>
                         </div>
                         @if($monthlyGoal)
                             <p class="text-gray-700">{{ $monthlyGoal['title'] }}</p>
-                            <p class="text-sm text-gray-400 underline text-right">期日: {{ $monthlyGoal['due'] }}</p>
+                            <p class="text-sm text-gray-700 underline text-right">期日: {{ $monthlyGoal['due'] }}</p>
                         @else
                             <p class="text-gray-700">月間目標はまだ設定されていません</p>
                         @endif
@@ -171,8 +184,8 @@
                         </div> --}}
                     </div>
                 @else
-                    <div class="w-full mt-3 bg-white p-6 rounded-lg shadow-sm" id="not-today-todos-list">
-                        <p class="text-gray-400 text-center text-sm" id="first-message">本日以外のTODOはありません</p>
+                    <div class="bg-white rounded p-2 mt-2" id="not-today-todos-list">
+                        <p class="text-gray-400 text-center text-sm p-3" id="first-message">期日を本日以降に設定するとこちらに表示されます</p>
                     </div>
                 @endif
             </div>
