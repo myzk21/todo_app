@@ -17,7 +17,6 @@ class CheckActionController extends Controller
         $posts = $request->validated();
         try {
             DB::beginTransaction();
-
             $weeklyGoalId = (int) $request->input('weeklyGoal_id');
             $monthlyGoalId = (int) $request->input('monthlyGoal_id');
 

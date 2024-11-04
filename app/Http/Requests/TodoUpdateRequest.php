@@ -24,10 +24,11 @@ class TodoUpdateRequest extends FormRequest
         return [
             'updateTitle' => 'required|string|max:50',
             'updateDescription' => 'nullable|string|max:500',
-            'updateDue' => 'nullable|date|after_or_equal:today',
+            'updateDue' => 'nullable|required_if:updateToCalendar,true|date|after_or_equal:today',
             'when_completed' => 'nullable|date',
             'updateProgress_rate' => 'nullable|integer',
             'updatePriority' => 'nullable|string',
+            'updateToCalendar' => 'nullable|boolean',
             // 'label' => 'nullable|string|max:25'
         ];
     }
@@ -39,6 +40,7 @@ class TodoUpdateRequest extends FormRequest
             'updateTitle.max' => 'タイトルは50文字以内で入力してください',
             'updateDescription.string' => '説明は文字で入力してください',
             'updateDescription.max' => '説明は500文字以内で入力してください',
+            'updateDue.required_if'=>'カレンダーに追加する場合、期日は必須です',
             'updateDue.date' => '期日は有効な日付で入力してください',
             'updateDue.after_or_equal' => '期日は今日以降の日付で入力してください',
             'updateProgress_rate.integer' => '進捗率は整数で入力してください',

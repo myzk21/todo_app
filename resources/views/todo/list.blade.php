@@ -2,6 +2,29 @@
     @section('load-vite-todo-script', true) {{--TODOに関するTSを使用--}}
 
     <section class="bg-gray-50 px-8 py-5">
+        @if(session()->has('invalidRefreshToken'))
+            <script>
+                window.onload = function() {
+                    if (!localStorage.getItem('hasReloaded')) {
+                        localStorage.setItem('hasReloaded', 'true');
+                        location.reload(); //一度だけページをリロード
+                    }
+                };
+            </script>
+            <p class="text-red-500 font-semibold mb-1 underline">Googleアカウントに接続してください</p>
+        @endif
+        @if ($errors->has('googleAuthError'))
+            <div class="relative bg-red-500 w-2/5 rounded mb-2 p-2 flex items-center ml-8">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1 text-white">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                </svg>
+                <p class="text-white font-semibold">{{ $errors->first('googleAuthError') }}</p>
+                <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
+            </div>
+        @endif
+
+        <div id="systemErrorContainer">{{--システムエラーを表示--}}</div>
+
         @if($weeklyGoal && $monthlyGoal)
             @if($weeklyGoal->due < now()->format('Y-m-d') && $monthlyGoal->due < now()->format('Y-m-d'))
                 <div id="notice" class="text-red-500">
@@ -19,14 +42,28 @@
         @endif
         <div class="grid grid-cols-3 gap-5"  id="todo_list">
             <div class="container mx-auto col-span-2">
-                <label class="toggle-switch inline-block">
-                    <div class="flex">
-                        <p class="text-sm mr-1">月間目標を表示</p>
-                        <input type="checkbox" id="monthly_check_box">
-                        <span class="mb-2"></span>
-                    </div>
-                </label>
-
+                <div class="flex justify-between">
+                    <label class="toggle-switch inline-block">
+                        <div class="flex">
+                            <p class="text-sm mr-1 select-none">月間目標を表示</p>
+                            <input type="checkbox" id="monthly_check_box">
+                            <span class="mb-2"></span>
+                        </div>
+                    </label>
+                    @if($google_user && $google_user->access_token && $google_user->refresh_token && !session()->has('invalidRefreshToken'))
+                        <p class="text-green-600 flex items-center text-sm select-none">Googleアカウント接続済み
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        </p>
+                    @else
+                        <a class="flex items-center px-2 py-1 text-sm text-green-600 font-semibold bg-white hover:bg-gray-100 mb-1 rounded-md  select-none cursor-pointer" href="{{ route('google.redirect') }}" id="connectToGoogle">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mr-1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
+                        Googleアカウントに接続</a>
+                    @endif
+                </div>
                 <div class="w-full mb-6 bg-white px-6 py-3">
                     <div class="flex mb-1">
                         <h2 class="text-xl font-bold">Weekly Goal / 週間目標</h2>
@@ -130,7 +167,6 @@
                 </div>
             </div>
 
-            {{-- <div class="container mx-auto col-span-1" id="not-today-todos-list"> --}}
             <div class="container mx-auto col-span-1">
                 <div class="w-full">
                     <p class="font-bold text-center">本日以降のTODO</p>
@@ -180,10 +216,6 @@
                                 </div>
                             </div>
                         @endforeach
-                        {{--ここに下ボタン表示--}}
-                        {{-- <div class="text-center my-2">
-                            <button id="load-more" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">もっと見る</button>
-                        </div> --}}
                     </div>
                 @else
                     <div class="bg-white rounded p-2 mt-2" id="not-today-todos-list">

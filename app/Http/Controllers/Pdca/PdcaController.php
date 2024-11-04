@@ -48,7 +48,7 @@ class PdcaController extends Controller
             return redirect()->route('home');
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'データの保存に失敗しました');
+            return redirect()->back()->withErrors(['error' => 'データの保存に失敗しました']);
             // dd($e->getMessage());
         }
     }

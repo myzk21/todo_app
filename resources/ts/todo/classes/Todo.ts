@@ -1,5 +1,27 @@
-// Todoクラス: Todoアイテムを表現
+export class GoogleUser {
+    constructor(
+        public id: number,
+        public access_token: string,
+        public refresh_token: string,
+    ) {}
+}
+
+export class User {
+    public google_user: GoogleUser | null;
+
+    constructor(
+        public id: number,
+        public name: string,
+        google_user: GoogleUser | null,
+    ) {
+        this.google_user = google_user;
+    }
+}
+
 export class Todo {
+    public google_user: GoogleUser | null;
+    public user: User;
+
     constructor(
         public id: number,
         public title: string,
@@ -10,17 +32,11 @@ export class Todo {
         public priority: string | null,
         public label: string | null,
         public deleted_at: Date | null,
-    ) {}
+        public event_id: string | null,
+        google_user: GoogleUser | null,
+        user: User,
+    ) {
+        this.google_user = google_user;
+        this.user = user;
+    }
 }
-// export class UpdateTodo {
-//     constructor(
-//         public id: number,
-//         public updateTitle: string,
-//         public updateDescription: string | null,
-//         public updateDue: Date | null,
-//         public when_completed: Date | null,
-//         public updateProgress_rate: string | null,
-//         public updatePriority: string | null,
-//         public updateLabel: string | null,
-//     ) {}
-// }
