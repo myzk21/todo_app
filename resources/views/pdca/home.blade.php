@@ -5,6 +5,17 @@
     @endphp
 
     @if($weeklyGoal && $monthlyGoal)
+        <div id="systemErrorContainer">
+        @if ($errors->has('error'))
+            <div class="relative bg-red-500 w-2/5 rounded mb-2 p-2 flex items-center ml-8">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1 text-white">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                </svg>
+                <p class="text-white font-semibold">{{ $errors->first('error') }}</p>
+                <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
+            </div>
+        @endif
+        </div>
         <div class="mx-auto px-8 py-4">
             @if($weeklyGoal->due < now()->format('Y-m-d') && $monthlyGoal->due < now()->format('Y-m-d'))
                 <div id="notice" class="text-red-500">
@@ -156,23 +167,31 @@
             </div>
         </div>
     @else
+        <div id="systemErrorContainer">
+        @error('error')
+            <div class="relative bg-red-500 w-2/5 rounded mb-2 p-2 flex items-center ml-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1 text-white">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                  </svg>
+                <p class="text-white font-semibold">{{ $message }}</p>
+                <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
+            </div>
+        @enderror
+        </div>
         <form class="mx-auto rounded shadow-md bg-white px-6 py-3 w-4/5 justify-center" action="{{ route('pdca.create-first-goal') }}" method="POST">
             @csrf
             <h1 class="text-xl underline font-semibold text-center mb-3 pt-2">目標を設定しましょう</h1>
-            @if ($errors->any())
-                <div class="text-red-500">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
             <div class="mb-5">
+                @error('weekly-goal')
+                    <p class="text-red-500 text-sm">{{ $message }}</p>
+                @enderror
                 <h2 class="text-xl font-bold mb-1">Weekly Goal / 週間目標</h2>
                 <input type="text" name="weekly-goal" class="placeholder:text-sm placeholder:text-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="2" placeholder="週間目標を入力" value="{{ old('weekly-goal') }}">
             </div>
             <div class="mb-4">
+                @error('monthly-goal')
+                    <p class="text-red-500 text-sm">{{ $message }}</p>
+                @enderror
                 <h2 class="text-xl font-bold mb-1">Monthly Goal / 月間目標</h2>
                 <input type="text" name="monthly-goal" class="placeholder:text-sm placeholder:text-gray-300 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-1" rows="2" placeholder="月間目標を入力" value="{{ old('monthly-goal') }}">
                 <p class="text-gray-500 text-xs mt-1">※期日は自動的に「今週末」または「今月末」に設定されます</p>

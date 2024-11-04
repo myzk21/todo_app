@@ -27,6 +27,28 @@
             <label for="due">期日</label>
             <input type="date" name="due" id="due" class="rounded" value="{{ old('due') }}">
         </div>
-        {{--余裕あるならここにラベルを追加--}}
+        @if($google_user && $google_user->access_token && $google_user->refresh_token)
+            <input type="hidden" name="googleUser" value="{{ $google_user->id }}">
+            <label class="inline-flex items-center cursor-pointer ml-2 sm:mt-1">
+                <input type="checkbox" class="hidden peer" name="addToCalendar" id="addToCalendarCheckbox" value="1">
+                <div class="w-5 h-5 border border-gray-500 rounded-sm peer-checked:bg-[#8b8a8e] relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                </div>
+                <p class="ml-1 select-none">Googleカレンダーに追加</p>
+            </label>
+        @else
+            <label class="inline-flex items-center cursor-pointer ml-2 sm:mt-1">
+                <input type="checkbox" class="hidden peer" name="addToCalendar" id="addToCalendarCheckbox" value="" disabled>
+                <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-[#8b8a8e] relative">
+                    {{--チェックマーク--}}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                </div>
+                <p class="ml-1 select-none line-through text-gray-500">Googleカレンダーに追加</p>
+            </label>
+        @endif
     </div>
 </div>

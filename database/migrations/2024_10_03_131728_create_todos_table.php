@@ -21,6 +21,7 @@ return new class extends Migration
             $table->date('when_completed')->nullable();
             $table->integer('progress_rate')->nullable();
             $table->string('priority')->nullable();
+            $table->string('event_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

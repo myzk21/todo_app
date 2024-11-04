@@ -34,9 +34,9 @@ class GoalController extends Controller
             DB::commit();
             return redirect()->route('home');
         } catch (\Exception $e) {
-            dd($e);
+            // dd($e);
             DB::rollback();
-            return redirect()->back()->with('error', 'データの保存に失敗しました');
+            return redirect()->back()->withErrors(['error' => 'データの保存に失敗しました']);
         }
     }
 }

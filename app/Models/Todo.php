@@ -19,5 +19,10 @@ class Todo extends Model
         'is_completed',
         'progress_rate',
         'priority',
+        'event_id',
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

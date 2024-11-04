@@ -44,4 +44,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function googleUser()
+    {
+        return $this->hasOne(GoogleUser::class);
+    }
 }

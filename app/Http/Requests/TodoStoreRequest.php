@@ -24,10 +24,11 @@ class TodoStoreRequest extends FormRequest
         return [
             'title' => 'required|string|max:50',
             'description' => 'nullable|string|max:500',
-            'due' => 'nullable|date|after_or_equal:today',
+            'due' => 'nullable|required_if:addToCalendar,true|date|after_or_equal:today',
             'when_completed' => 'nullable|date',
             'progress_rate' => 'nullable|integer',
             'priority' => 'nullable|string',
+            'addToCalendar' => 'nullable|boolean',
             // 'label' => 'nullable|string|max:25'
         ];
 
@@ -41,6 +42,7 @@ class TodoStoreRequest extends FormRequest
             'description.string' => '説明は文字で入力してください',
             'description.max' => '説明は500文字以内で入力してください',
             'due.date' => '期日は有効な日付で入力してください',
+            'due.required_if'=>'カレンダーに追加する場合、期日は必須です',
             'due.after_or_equal' => '期日は今日以降の日付で入力してください',
             'progress_rate.integer' => '進捗率は整数で入力してください',
         ];

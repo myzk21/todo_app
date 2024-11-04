@@ -5,6 +5,7 @@ use App\Http\Controllers\Todo\TodoController;
 use App\Http\Controllers\Pdca\PdcaController;
 use App\Http\Controllers\Pdca\CheckActionController;
 use App\Http\Controllers\Pdca\GoalController;
+use App\Http\Controllers\Auth\OAuthController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -23,6 +24,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    //google認証確認
+    Route::get('/check-auth', [OAuthController::class, 'getGoogleUser']);
 
     //TODO作成
     Route::post('/add_todo', [TodoController::class, 'store']);
@@ -44,6 +48,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/create-check-action', [CheckActionController::class, 'store'])->name('pdca.create-check-action');
     //PDCA check & action更新
     Route::patch('/create-check-action/{check_id}/{action_id}', [CheckActionController::class, 'update'])->name('pdca.update-check-action');
+    //OAuth認証するためのURLにリダイレクトする
+    Route::get('/auth/google/redirect', [OAuthController::class, 'redirectToGoogle'])->name('google.redirect');
+    // oauthで飛んできたコードを使ってユーザを認証している
+    Route::get('/auth/google/callback', [OAuthController::class, 'authenticateWithGoogle']);
 });
 
 require __DIR__.'/auth.php';

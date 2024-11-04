@@ -5,14 +5,9 @@ export class TodoService {
     static async changeTodoStatus(todoId: string | null): Promise<Todo> {
         try {
             const response: AxiosResponse<{ success: boolean, todo: Todo }> = await axios.patch(`/changeTodoStatus/${todoId}`);
-            // const response = await axios.patch(`/changeTodoStatus/${todoId}`, {
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     }
-            // });
             return response.data.todo;
         } catch(error){
-            throw new Error('Todoの更新に失敗しました');//この方式で書くとブラウザにエラーを表示させられる
+            throw new Error('Todoの更新に失敗しました');
         }
     }
 
@@ -44,7 +39,6 @@ export class TodoService {
     static async updateTodo(updateFormData: FormData): Promise<Todo> {
         try {
             const todoId = updateFormData.get('id');
-            // const response = await axios.patch(`/update_todo/${todoId}`, updateFormData);→これではなぜか送信されない（nullになる）
             const response = await axios.patch(`/update_todo/${todoId}`, updateFormData, {
                 headers: {
                     'Content-Type': 'application/json'
@@ -73,6 +67,7 @@ export class TodoService {
         }
     }
 }
+
 function displayCreateValidationErrors(errors: any) {
     const errorContainer = document.getElementById('errorContainer') as HTMLElement;
     errorContainer.innerHTML = ''; //既存のエラーをクリア

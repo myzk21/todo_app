@@ -6,7 +6,7 @@ import { Todo } from '../classes/Todo';
 const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement).content;
 
 export class TodoApp {
-    private addButton: HTMLElement;
+    private addButton: HTMLButtonElement;
     private todoCreateForm: HTMLFormElement;
     private todoTitleInput: HTMLInputElement;
     private todoDescriptionInput: HTMLInputElement;
@@ -14,6 +14,7 @@ export class TodoApp {
     private priority: HTMLInputElement;
     private due: HTMLInputElement;
     private todoDetailModal = document.getElementById('todo_detail_modal') as HTMLElement;
+    private addToCalendarCheckbox = document.getElementById('addToCalendarCheckbox') as HTMLInputElement;
 
     constructor(
         addButtonId: string,
@@ -24,7 +25,7 @@ export class TodoApp {
         priorityId: string,
         dueId: string
     ) {
-        this.addButton = document.getElementById(addButtonId) as HTMLElement;
+        this.addButton = document.getElementById(addButtonId) as HTMLButtonElement;
         this.todoCreateForm = document.getElementById(todoCreateFormId) as HTMLFormElement;
         this.todoTitleInput = document.getElementById(todoTitleInputId) as HTMLInputElement;
         this.todoDescriptionInput = document.getElementById(todoDescriptionInputId) as HTMLInputElement;
@@ -55,27 +56,38 @@ export class TodoApp {
                 const due = todoContainer.querySelector('.due') as HTMLInputElement;
 
                 const todoId = todoContainer.id;
-
-                if (todoId) {
-                    const newTodoStatus: Todo = await TodoService.changeTodoStatus(todoId);
-                    if(newTodoStatus.when_completed) {
-                        todoContainer.classList.add('opacity-25');
-                        title.classList.add('line-through');
-                        description.classList.add('line-through');
-                        progress.classList.add('line-through');
-                        priority.classList.add('line-through');
-                        due.classList.add('line-through');
+                try {
+                    if (todoId) {
+                        const newTodoStatus: Todo = await TodoService.changeTodoStatus(todoId);
+                        if(newTodoStatus.when_completed) {
+                            todoContainer.classList.add('opacity-25');
+                            title.classList.add('line-through');
+                            description.classList.add('line-through');
+                            progress.classList.add('line-through');
+                            priority.classList.add('line-through');
+                            due.classList.add('line-through');
+                        } else {
+                            todoContainer.classList.remove('opacity-25');
+                            title.classList.remove('line-through');
+                            description.classList.remove('line-through');
+                            progress.classList.remove('line-through');
+                            priority.classList.remove('line-through');
+                            due.classList.remove('line-through');
+                        }
                     } else {
-                        todoContainer.classList.remove('opacity-25');
-                        title.classList.remove('line-through');
-                        description.classList.remove('line-through');
-                        progress.classList.remove('line-through');
-                        priority.classList.remove('line-through');
-                        due.classList.remove('line-through');
+                        console.error('Todo IDが見つかりません。');
                     }
-                    //ここでtodo.when_completedがnullならcompletedクラスを削除ー＞そうでなけえればcompletedをつける
-                } else {
-                    console.error('Todo IDが見つかりません。');
+                } catch(error) {
+                    const errorContainer = document.getElementById('systemErrorContainer') as HTMLElement;
+                    errorContainer.innerHTML = '';
+                    errorContainer.innerHTML = `
+                    <div class="relative bg-red-500 w-2/5 rounded mb-2 p-2 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1 text-white">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                        </svg>
+                        <p class="text-white font-semibold">システムエラーが発生しました</p>
+                        <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
+                    </div>`;
                 }
             }
         });
@@ -83,10 +95,10 @@ export class TodoApp {
 
     // Todoの追加処理
     private async addTodo() {
+        this.addButton.disabled = true;
         const formData = new FormData(this.todoCreateForm);
         formData.append('_token', csrfToken);
         if (!formData) return;
-
         try {
             const newTodo: Todo = await TodoService.addTodo(formData);//サービスクラスを呼び出してTodoを追加
             const errorContainer = document.getElementById('errorContainer') as HTMLElement;
@@ -96,9 +108,24 @@ export class TodoApp {
             this.percentage.value = '';
             this.priority.value = '';
             this.due.value = '';
+            this.addButton.disabled = false;
+            if (this.addToCalendarCheckbox.checked) {
+                this.addToCalendarCheckbox.checked = false; // チェックを外す
+            }
             errorContainer.innerHTML = ''; //既存のエラーをクリア
             console.log('Todoの追加に成功しました');
         } catch (error) {
+            const errorContainer = document.getElementById('systemErrorContainer') as HTMLElement;
+            errorContainer.innerHTML = '';
+            errorContainer.innerHTML = `
+            <div class="relative bg-red-500 w-2/5 rounded mb-2 p-2 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1 text-white">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                  </svg>
+                <p class="text-white font-semibold">TODOの追加に失敗しました</p>
+                <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
+            </div>`;
+            this.addButton.disabled = false;
             console.error('Todoの追加に失敗しました');
         }
     }
@@ -140,7 +167,8 @@ export class TodoApp {
     }
 
     // Todoの更新処理
-    private async updateTodo() {
+    private async updateTodo(addButton: HTMLButtonElement) {
+        addButton.disabled = true;
         const todoUpdateForm = document.getElementById('todo_update_form') as HTMLFormElement;
         const updateFormData = new FormData(todoUpdateForm);
         updateFormData.append('_token', csrfToken);
@@ -148,14 +176,23 @@ export class TodoApp {
         try {
             const updateTodo: Todo = await TodoService.updateTodo(updateFormData);//サービスクラスを呼び出してTodoを追加
             this.renderTodo(updateTodo);
+            addButton.disabled = false;
             this.todoDetailModal.innerHTML = '';
             console.log('Todoの更新に成功しました');
         } catch (error) {
+            const errorContainer = document.getElementById('systemErrorContainer') as HTMLElement;
+            errorContainer.innerHTML = '';
+            errorContainer.innerHTML = `
+            <div class="relative bg-red-500 w-2/5 rounded mb-2 p-2 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1 text-white">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                  </svg>
+                <p class="text-white font-semibold">TODOの更新に失敗しました</p>
+                <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
+            </div>`;
+            this.addButton.disabled = false;
+            this.todoDetailModal.innerHTML = '';
             console.error('Todoの更新に失敗しました');
-            console.error('Todoの更新に失敗しました。エラーの詳細: ', {
-                message: error instanceof Error ? error.message : '未知のエラー',
-                stack: error instanceof Error ? error.stack : 'スタックトレースなし',
-            });
         }
     }
 
@@ -167,16 +204,29 @@ export class TodoApp {
                 //todo_delete_btnクラスを持つ要素がクリックされた場合
                 if (target.closest('.todo_delete_btn')) {
                     if(!confirm('本当に削除しますか？')) return;
+                    const deleteBtn = target.closest('.todo_delete_btn') as HTMLAnchorElement; //クリックされた<a>要素を取得
                     try{
-                        const deleteBtn = target.closest('.todo_delete_btn') as HTMLAnchorElement; //クリックされた<a>要素を取得
+                        deleteBtn.classList.add('pointer-events-none');
                         const todoId = deleteBtn.getAttribute('todo-id'); //todo-id属性を取得
                         if (todoId) {
                             const deleteTodo: Todo = await TodoService.deleteTodo(todoId);
+                            deleteBtn.classList.remove('pointer-events-none');
                             this.renderTodo(deleteTodo);
                         } else {
-                            console.error('Todo IDが見つかりません。');
+                            throw new Error('Todo IDが見つかりません。');
                         }
                     } catch(error) {
+                        const errorContainer = document.getElementById('systemErrorContainer') as HTMLElement;
+                        errorContainer.innerHTML = '';
+                        errorContainer.innerHTML = `
+                        <div class="relative bg-red-500 w-2/5 rounded mb-2 p-2 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1 text-white">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                              </svg>
+                            <p class="text-white font-semibold">TODOの削除に失敗しました</p>
+                            <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
+                        </div>`;
+                        deleteBtn.classList.remove('pointer-events-none');
                         console.error('Todoの削除に失敗しました');
                     }
                 }
@@ -184,6 +234,10 @@ export class TodoApp {
     }
 
     private createDetailModal(showTodo: Todo) {//todo作成モーダル
+        let authenticatedByGoogle = false;
+        if (showTodo.user.google_user) {//Googleユーザーがあるかどうかを調べる
+            authenticatedByGoogle = true;
+        }
         const modalHTML = `
             <div class="w-full h-full z-50 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                 <div class="px-6 pb-5 pt-3 shadow-sm w-3/5 rounded bg-white" id="">
@@ -223,6 +277,17 @@ export class TodoApp {
                                 <label for="due">期日</label>
                                 <input type="date" name="updateDue" id="due" class="rounded" value="${showTodo.due ?? ""}">
                             </div>
+                            <input type="hidden" name="googleUser" value="${showTodo.user.google_user ? showTodo.user.google_user.id : ''}">
+                            <input type="hidden" name="event_id" value="${showTodo.event_id ? showTodo.event_id : ''}">
+                            <label class="inline-flex items-center cursor-pointer ml-2 sm:mt-1">
+                                <input type="checkbox" class="hidden peer" name="updateToCalendar" id="addToCalendarCheckbox" value="1" ${showTodo.event_id ? 'checked' : ''}  ${authenticatedByGoogle ? '' : 'disabled'}>
+                                <div class="w-5 h-5 border border-gray-500 rounded-sm peer-checked:bg-[#8b8a8e] relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                </div>
+                                <p class="ml-1 select-none ${authenticatedByGoogle ? '' : 'line-through'}">Googleカレンダーに追加</p>
+                            </label>
                         </div>
                         <div class="w-full flex mt-1">
                             <button class="bg-[#8b8a8e] text-white text-sm px-4 py-2 rounded ml-auto hover:bg-opacity-80 select-none flex justify-end" id="todo_update_btn">保存</button>
@@ -239,10 +304,10 @@ export class TodoApp {
             this.todoDetailModal.innerHTML = '';
         });
 
-        const addButton = document.getElementById('todo_update_btn') as HTMLElement;
+        const addButton = document.getElementById('todo_update_btn') as HTMLButtonElement;
         addButton.addEventListener('click', (event: MouseEvent) => {
             event.preventDefault();
-            this.updateTodo();//TODOの更新
+            this.updateTodo(addButton);//TODOの更新
         });
         //詳細画面での削除
         const deleteButton = document.querySelector('.todo_delete_btn') as HTMLElement;
@@ -251,15 +316,29 @@ export class TodoApp {
             if(!confirm('本当に削除しますか？')) return;
             try{
                 const todoId = deleteButton.getAttribute('todo-id'); //todo-id属性を取得
+                deleteButton.classList.add('pointer-events-none');
                 if (todoId) {
                     const deleteTodo: Todo = await TodoService.deleteTodo(todoId);
+                    deleteButton.classList.remove('pointer-events-none');
                     this.renderTodo(deleteTodo);
                     //モーダルをとじる
                     if(this.todoDetailModal)this.todoDetailModal.innerHTML = '';
                 } else {
-                    console.error('Todo IDが見つかりません。');
+                    throw new Error('Todo IDが見つかりません。');
                 }
             } catch(error) {
+                const errorContainer = document.getElementById('systemErrorContainer') as HTMLElement;
+                errorContainer.innerHTML = '';
+                errorContainer.innerHTML = `
+                <div class="relative bg-red-500 w-2/5 rounded mb-2 p-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                      </svg>
+                    <p class="text-white font-semibold">TODOの削除に失敗しました</p>
+                    <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
+                </div>`;
+                deleteButton.classList.remove('pointer-events-none');
+                if(this.todoDetailModal)this.todoDetailModal.innerHTML = '';
                 console.error('Todoの削除に失敗しました');
             }
         });

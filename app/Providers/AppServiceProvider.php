@@ -3,6 +3,7 @@
 namespace App\Providers;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Google\Client as Google_Client;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +12,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(Google_Client::class, function () {
+            return new Google_Client([
+                'client_id' => config('services.google.client_id'),
+                'client_secret' => config('services.google.client_secret')
+            ]);
+        });
     }
 
     /**

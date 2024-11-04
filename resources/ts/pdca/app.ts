@@ -3,6 +3,15 @@ import { PdcaApp } from './components/PdcaApp';
 //ページが読み込まれた時にTodoAppを初期化
 document.addEventListener('DOMContentLoaded', () => {
 
+    //システムエラーが表示された場合、クリックしてその要素を削除する
+    const errorContainer = document.getElementById('systemErrorContainer') as HTMLElement;
+    errorContainer.addEventListener('click', async (event) => {
+        const target = event.target as HTMLElement;
+        if (target.id === 'closeSystemError') {
+            errorContainer.innerHTML = '';
+        }
+    });
+
     //PDCAの星
     const weeklyStars = document.querySelectorAll<SVGElement>('.weekly-star');
     const monthlyStars = document.querySelectorAll<SVGElement>('.monthly-star');

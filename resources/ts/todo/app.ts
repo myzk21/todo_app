@@ -4,6 +4,15 @@ import { TodoApp } from './components/TodoApp';
 document.addEventListener('DOMContentLoaded', () => {
     const todoApp = new TodoApp('todo_add_btn', 'todo_create_form', 'todo_title_input', 'todo_description_input', 'percentage', 'priority', 'due');
 
+    //システムエラーが表示された場合、クリックしてその要素を削除する
+    const errorContainer = document.getElementById('systemErrorContainer') as HTMLElement;
+    errorContainer.addEventListener('click', async (event) => {
+        const target = event.target as HTMLElement;
+        if (target.id === 'closeSystemError') {
+            errorContainer.innerHTML = '';
+        }
+    });
+
     //以下月間目標表示処理
     const checkBox = document.getElementById('monthly_check_box') as HTMLInputElement;
     const monthlyGoal = document.getElementById('monthly_goal') as HTMLElement;
