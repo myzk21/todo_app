@@ -1,8 +1,8 @@
 <使用技術><br>
 ・Laravel11<br>
-・Tailwind Css<br>
-
-<パッケージ><br>
+・Tailwind css<br>
+・Google API Client<br>
+・Laravel Socialite<br>
 ・Laravel Breeze<br>
 
 <レイアウトルール＞<br>
@@ -13,10 +13,11 @@
 <フロントエンド構造><br>
 resources/<br>
   └── ts/<br>
-      ├── classes/            OOPのクラスを格納<br>
-      │   └── Todo.ts           Todoモデルクラス<br>
-      ├── services/           サービスクラス（API通信などのロジック）<br>
-      │   └── TodoService.ts    Todoに関連するAjax（API）通信処理<br>
-      ├── components/         UIやアプリケーションのロジック<br>
-      │   └── TodoApp.ts        Todoアプリのコントローラー的役割<br>
-      └── app.ts              アプリ全体のエントリーポイント<br>
+       └── todo (pdca)/<br>
+              ├── classes/            クラスを格納<br>
+              │   └── Todo.ts           Todoモデルクラス<br>
+              ├── services/           サービスクラス（API通信などのロジック）<br>
+              │   └── TodoService.ts    Todoに関連するAjax（API）通信処理<br>
+              ├── components/         UIやアプリケーションのロジック<br>
+              │   └── TodoApp.ts        Todoアプリのコントローラー的役割<br>
+              └── app.ts              アプリ全体のエントリーポイント<br>
