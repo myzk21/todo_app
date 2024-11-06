@@ -7,8 +7,7 @@
 
 <データベース設計><br>
 [ER図]<br>
-![スクリーンショット 2024-11-06 232638](https://github.com/user-attachments/assets/630c24ed-6501-4bd4-974b-eb1fede42743)
-
+![Untitled](https://github.com/user-attachments/assets/3d7574cd-3922-4a50-b81a-1babb9c270e1)
 
 <レイアウトルール＞<br>
 ・背景色　#f9fafb<br>
