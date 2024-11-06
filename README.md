@@ -5,6 +5,11 @@
 ・Laravel Socialite<br>
 ・Laravel Breeze<br>
 
+<データベース設計><br>
+[ER図]<br>
+![スクリーンショット 2024-11-06 232638](https://github.com/user-attachments/assets/630c24ed-6501-4bd4-974b-eb1fede42743)
+
+
 <レイアウトルール＞<br>
 ・背景色　#f9fafb<br>
 ・header背景色　#8b8a8e<br>
@@ -21,3 +26,4 @@ resources/<br>
               ├── components/         UIやアプリケーションのロジック<br>
               │   └── TodoApp.ts        Todoアプリのコントローラー的役割<br>
               └── app.ts              アプリ全体のエントリーポイント<br>
+              
