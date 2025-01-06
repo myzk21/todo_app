@@ -4,7 +4,7 @@
     </div>
     <div class="flex flex-wrap pt-1">
         <div class="w-full sm:w-auto mb-4 sm:mb-0">
-            <label for="percentage">進捗率</label>
+            <label for="percentage" class="select-none">進捗率</label>
             <select id="percentage" class="rounded mr-4" name="progress_rate">
                 <option value="">--</option>
                 @for($i = 0; $i <= 100; $i += 10)
@@ -15,7 +15,7 @@
             </select>
         </div>
         <div class="w-full sm:w-auto mb-4 sm:mb-0">
-            <label for="priority">優先度</label>
+            <label for="priority" class="select-none">優先度</label>
             <select id="priority" class="rounded mr-4" name="priority">
                 <option value="">--</option>
                 <option value="高" {{ old('priority') == "高" ? 'selected' : '' }}>高</option>
@@ -24,7 +24,7 @@
             </select>
         </div>
         <div class="w-full sm:w-auto mb-4 sm:mb-0">
-            <label for="due">期日</label>
+            <label for="due" class="select-none">期日</label>
             <input type="date" name="due" id="due" class="rounded" value="{{ old('due') }}">
         </div>
         @if($google_user && $google_user->access_token && $google_user->refresh_token)

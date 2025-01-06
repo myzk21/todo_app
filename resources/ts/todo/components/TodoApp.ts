@@ -49,30 +49,27 @@ export class TodoApp {
             const target = event.target as HTMLElement;
             if (target.classList.contains('todo-checkbox')) {
                 const  todoContainer = target.closest('.todo-container') as HTMLTableRowElement | HTMLDivElement;
-                const title = todoContainer.querySelector('.title') as HTMLInputElement;
-                const description = todoContainer.querySelector('.description') as HTMLTextAreaElement;
-                const progress = todoContainer.querySelector('.progress_rate') as HTMLSelectElement;
-                const priority = todoContainer.querySelector('.priority') as HTMLSelectElement;
-                const due = todoContainer.querySelector('.due') as HTMLInputElement;
-
                 const todoId = todoContainer.id;
+                const userActionDialog = document.getElementById('user_action_dialog') as HTMLElement;
                 try {
                     if (todoId) {
-                        const newTodoStatus: Todo = await TodoService.changeTodoStatus(todoId);
-                        if(newTodoStatus.when_completed) {
-                            todoContainer.classList.add('opacity-25');
-                            title.classList.add('line-through');
-                            description.classList.add('line-through');
-                            progress.classList.add('line-through');
-                            priority.classList.add('line-through');
-                            due.classList.add('line-through');
+                        const newTodo: Todo = await TodoService.changeTodoStatus(todoId);
+                        if(newTodo.is_completed == true) {
+                            todoContainer.remove();//未完了から削除
+                            this.createTodoItem(newTodo);
+                            userActionDialog.classList.remove('hidden');
+                            userActionDialog.textContent = `「${newTodo.title}」を完了にしました`;
+                            setTimeout(() => {
+                                userActionDialog.classList.add('hidden'); // 3秒後に非表示
+                            }, 3000);
                         } else {
-                            todoContainer.classList.remove('opacity-25');
-                            title.classList.remove('line-through');
-                            description.classList.remove('line-through');
-                            progress.classList.remove('line-through');
-                            priority.classList.remove('line-through');
-                            due.classList.remove('line-through');
+                            todoContainer.remove();//完了のところから削除
+                            this.createTodoItem(newTodo);
+                            userActionDialog.classList.remove('hidden');
+                            userActionDialog.textContent = `「${newTodo.title}」を未完了にしました`;
+                            setTimeout(() => {
+                                userActionDialog.classList.add('hidden'); // 3秒後に非表示
+                            }, 3000);
                         }
                     } else {
                         console.error('Todo IDが見つかりません。');
@@ -113,6 +110,12 @@ export class TodoApp {
                 this.addToCalendarCheckbox.checked = false; // チェックを外す
             }
             errorContainer.innerHTML = ''; //既存のエラーをクリア
+            const userActionDialog = document.getElementById('user_action_dialog') as HTMLElement;
+            userActionDialog.classList.remove('hidden');
+            userActionDialog.textContent = `「${newTodo.title}」を追加しました`;
+            setTimeout(() => {
+                userActionDialog.classList.add('hidden'); // 3秒後に非表示
+            }, 3000);
             console.log('Todoの追加に成功しました');
         } catch (error) {
             const errorContainer = document.getElementById('systemErrorContainer') as HTMLElement;
@@ -178,6 +181,12 @@ export class TodoApp {
             this.renderTodo(updateTodo);
             addButton.disabled = false;
             this.todoDetailModal.innerHTML = '';
+            const userActionDialog = document.getElementById('user_action_dialog') as HTMLElement;
+            userActionDialog.classList.remove('hidden');
+            userActionDialog.textContent = `「${updateTodo.title}」を更新しました`;
+            setTimeout(() => {
+                userActionDialog.classList.add('hidden'); // 3秒後に非表示
+            }, 3000);
             console.log('Todoの更新に成功しました');
         } catch (error) {
             const errorContainer = document.getElementById('systemErrorContainer') as HTMLElement;
@@ -256,7 +265,7 @@ export class TodoApp {
                                 <label for="percentage">進捗率</label>
                                 <select id="percentage" class="rounded mr-4" name="updateProgress_rate">
                                     <option value="">--</option>
-                                    ${Array.from({ length: 7 }, (_, i) => {
+                                    ${Array.from({ length: 11 }, (_, i) => {
                                         const value = i * 10; // 0, 10, 20, ..., 100
                                         const showRateNum = showTodo.progress_rate !== null ? Number(showTodo.progress_rate) : null;
                                         const isSelected = showRateNum === value ? 'selected' : '';
@@ -344,87 +353,7 @@ export class TodoApp {
         });
     }
 
-    private isTodaysTodo(existingTodoItem: HTMLTableRowElement | HTMLDivElement) {//変更するTODOの場所を特定(本日か本日じゃないか)
-        const parent = existingTodoItem.parentElement;
-        if (parent && parent.id === 'todo-table') {
-            return true;
-        }
-        return false;
-    }
-
-    private createNotTodayTodoItem(todo: Todo, dueDate: Date) {
-        const notTodayTodosList = document.getElementById('not-today-todos-list') as HTMLElement;
-        // 新しいTODO要素を作成
-        const todoItem = document.createElement('div');
-        todoItem.className = `bg-white shadow-sm rounded-lg px-6 py-4 max-w-md mx-auto my-3 todo-container ${todo.when_completed ? 'opacity-25' : ''}`;
-        todoItem.id = String(todo.id);
-
-        // TODOの内容を設定
-        todoItem.innerHTML = `
-            <div class="w-full flex mb-2">
-                <label class="inline-flex items-center cursor-pointer -ml-2">
-                    <input type="checkbox" class="hidden peer todo-checkbox">
-                    <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-[#8b8a8e] ${todo.when_completed ? 'bg-[#8b8a8e]' : ''} relative">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                        </svg>
-                    </div>
-                </label>
-                <a href="#" class="showBtn ml-auto cursor-pointer text-sm hover:underline select-none mr-3" todo-id="${todo.id}">詳細</a>
-                <a href="#" class="todo_delete_btn hover:underline text-center" todo-id="${todo.id}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5 text-gray-400">
-                        <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
-                    </svg>
-                </a>
-            </div>
-            <div class="mb-4">
-                <p class="text-gray-700 font-bold">タイトル</p>
-                <p class="text-gray-900 ml-2 title ${todo.when_completed ? 'line-through' : ''}">${todo.title.slice(0, 7) + (todo.title.length > 7 ? '...' : '')}</p>
-            </div>
-            <div class="mb-4">
-                <p class="text-gray-700 font-bold">内容</p>
-                <p class="text-gray-900 ml-2 description ${todo.when_completed ? 'line-through' : ''}">${(todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--')}</p>
-            </div>
-            <div class="flex justify-between">
-                <div class="">
-                    <p class="text-gray-700 font-bold">進捗率</p>
-                    <p class="text-gray-900 ml-2 progress_rate ${todo.when_completed ? 'line-through' : ''}">${todo.progress_rate ?? '--'}%</p>
-                </div>
-                <div class="">
-                    <p class="text-gray-700 font-bold">優先度</p>
-                    <p class="text-gray-900 ml-2 priority ${todo.when_completed ? 'line-through' : ''}">${todo.priority ?? '--'}</p>
-                </div>
-                <div class="">
-                    <p class="text-gray-700 font-bold">期日</p>
-                    <p class="text-gray-900 ml-2 due ${todo.when_completed ? 'line-through' : ''}">${todo.due}</p>
-                </div>
-            </div>
-        `;
-        //サイドに期日順に挿入
-        const todos = Array.from(notTodayTodosList.children);
-        let inserted = false;
-
-        todos.forEach((existingTodo) => {
-            const dueText = existingTodo.querySelector('.due')?.textContent;
-            const existingDue = dueText ? new Date(dueText) : null;
-            if(!existingDue) {//サイドに元々なかったらそのまま追加
-                notTodayTodosList.appendChild(todoItem);
-            } else if (dueDate < existingDue && !inserted) {//insertedを使用することでもしdueDateよりも後の既存のTODOが複数あった場合にループで何回も追加されないようにする→一度追加したらinsertedがtrueになるから
-                // console.log(existingTodo);
-                notTodayTodosList.insertBefore(todoItem, existingTodo);
-                inserted = true;
-            }
-        });
-        // もし適切な場所がなければ最後に追加
-        if (!inserted) {
-            const firstMessage = document.getElementById('first-message');
-            if(firstMessage) firstMessage.remove();//初期メッセージを削除
-            notTodayTodosList.appendChild(todoItem);//一番最初のタスク
-        }
-    }
-
-
-    private updateTodoItem(existingTodoItem: HTMLTableRowElement | HTMLDivElement, todo: Todo) {//todoのレイアウトを編集
+    private updateTodoItem(existingTodoItem: HTMLTableRowElement | HTMLDivElement, todo: Todo) {
         const title = existingTodoItem.querySelector('.title') as HTMLInputElement;
         const description = existingTodoItem.querySelector('.description') as HTMLTextAreaElement;
         const progress = existingTodoItem.querySelector('.progress_rate') as HTMLSelectElement;
@@ -435,67 +364,42 @@ export class TodoApp {
         description.textContent = todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--';
         progress.textContent = `${todo.progress_rate ?? '--'}%`;
         priority.textContent = todo.priority ?? '--';
-
-        if(todo.due) {
-            due.textContent = todo.due;
-            const dueDate = new Date(todo.due); //todo.dueをDate型に変換
-            dueDate.setHours(0, 0, 0, 0);
-            const today = new Date(); //今日の日付を取得
-            today.setHours(0, 0, 0, 0);//時間を無視するために0にする
-
-            if(this.isTodaysTodo(existingTodoItem) && dueDate.getTime() > today.getTime()) {//変更するTODOが本日のタスク&&期日が今日より遅い
-                // console.log('1');
-                existingTodoItem.remove();
-                this.createNotTodayTodoItem(todo, dueDate);//サイドに順番通りに表示
-                return;
-            } else if(this.isTodaysTodo(existingTodoItem) && dueDate.getTime() === today.getTime()) {//期日が今日の場合
-                // console.log('2');
-                due.textContent = todo.due;
-                return;
-            }
-            if(!this.isTodaysTodo(existingTodoItem) && dueDate.getTime() === today.getTime()) {//既存がサイドにある＋期日本日に変更
-                // console.log('3');
-                existingTodoItem.remove();
-                this.createTodoItem(todo);//本日の方に追加
-                return;
-            } else if(!this.isTodaysTodo(existingTodoItem) && dueDate.getTime() > today.getTime()) {//既存がサイド＋期日今日より遅い
-                // console.log('4');
-                existingTodoItem.remove();
-                this.createNotTodayTodoItem(todo, dueDate);//サイドに順番通りに表示
-                return;
-            }
-        } else {
-            if(!this.isTodaysTodo(existingTodoItem)) {//変更対象がサイドにある場合
-                existingTodoItem.remove();
-                this.createTodoItem(todo);//本日の方に追加
-                return;
-            } else {
-                due.textContent = '--';
-            }
-        }
+        due.textContent = todo.due ?? '--';
     }
 
     private createTodoItem(todo: Todo) {//新しいtodoのレイアウトを作成
-        const todoTableBody = document.getElementById('todo-table') as HTMLElement;
+        let todoTableBody: HTMLTableSectionElement;
+        if(todo.is_completed == true) {
+            const completeTaskTable = document.getElementById('completeTaskTable') as HTMLElement;
+            todoTableBody = completeTaskTable.querySelector('.completeTaskTableBody') as HTMLTableSectionElement;
+            const firstTodayMessage = document.getElementById('first-completed-todo-message');
+            if(firstTodayMessage) firstTodayMessage.remove();//初期メッセージを削除
+        } else {
+            const incompleteTaskTable = document.getElementById('incompleteTaskTable') as HTMLElement;
+            todoTableBody = incompleteTaskTable.querySelector('.incompleteTaskTableBody') as HTMLTableSectionElement;
+            const firstTodayMessage = document.getElementById('first-incompleted-todo-message');
+            if(firstTodayMessage) firstTodayMessage.remove();//初期メッセージを削除
+        }
         const newRow = document.createElement('tr');
-        newRow.className = `border border-gray-100 todo-item todo-container ${todo.when_completed ? 'opacity-25' : ''}`;
+        newRow.className = `border border-gray-100 todo-item todo-container ${todo.is_completed ? 'opacity-30' : ''}`;
         newRow.id = `${todo.id}`;
+        newRow.setAttribute('data-created-at', todo.created_at);
         newRow.innerHTML = `
             <td class="px-4 py-3 text-center">
                <label class="inline-flex items-center">
                     <input type="checkbox" class="hidden peer todo-checkbox">
-                    <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-gray-500  ${todo.when_completed ? 'bg-[#8b8a8e]' : ''}  relative">
+                    <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-gray-500 relative ${todo.is_completed ? 'bg-[#8b8a8e]' : ''}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                         </svg>
                     </div>
                 </label>
             </td>
-            <td class="px-4 py-3 text-center title ${todo.when_completed ? 'line-through' : ''}">${todo.title.slice(0, 7) + (todo.title.length > 7 ? '...' : '')}</td>
-            <td class="px-4 py-3 text-center description ${todo.when_completed ? 'line-through' : ''}">${(todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--')}</td>
-            <td class="px-4 py-3 text-center progress_rate ${todo.when_completed ? 'line-through' : ''}">${todo.progress_rate ?? '--'}%</td>
-            <td class="px-4 py-3 text-center priority ${todo.when_completed ? 'line-through' : ''}">${todo.priority ?? '--'}</td>
-            <td class="px-4 py-3 text-center due ${todo.when_completed ? 'line-through' : ''}">${todo.due ?? '--'}</td>
+            <td class="px-4 py-3 text-center title">${todo.title.slice(0, 7) + (todo.title.length > 7 ? '...' : '')}</td>
+            <td class="px-4 py-3 text-center description">${(todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--')}</td>
+            <td class="px-4 py-3 text-center progress_rate">${todo.progress_rate ?? '--'}%</td>
+            <td class="px-4 py-3 text-center priority">${todo.priority ?? '--'}</td>
+            <td class="px-4 py-3 text-center due">${todo.due ?? '--'}</td>
             <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
                 <a href="#" class="showBtn" todo-id="${todo.id}">詳細</a>
             </td>
@@ -507,20 +411,32 @@ export class TodoApp {
                 </a>
             </td>
         `;
-
-        if(todo.due) {
-            const dueDate = new Date(todo.due); //todo.dueをDate型に変換
-            dueDate.setHours(0, 0, 0, 0);
-            const today = new Date(); //今日の日付を取得
-            today.setHours(0, 0, 0, 0);//時間を無視するために0にする
-
-            if(dueDate > today) {
-                this.createNotTodayTodoItem(todo, dueDate);//もし期日が今日以降ならサイドに表示
-                return;
+        if(todo.is_completed == true) {
+            todoTableBody.insertBefore(newRow, todoTableBody.firstChild);//todoTableBodyの一番上に追加
+        } else {
+            //未完了のタスクの場合created_atの降順になるように挿入（完了から未完了にする場合もあるためこの方式にする）
+            const tableRow = todoTableBody.querySelectorAll('.todo-container') as NodeListOf<HTMLTableRowElement>;
+            if(tableRow.length != 0) {
+                let added = false;
+                for(let i = 0; i < tableRow.length; i++) {
+                    const row = tableRow[i];
+                    const createdAt = row.getAttribute('data-created-at');
+                    if(createdAt) {
+                        const existingCreatedAt = new Date(createdAt);
+                        const newTodoCreatedAt = new Date(todo.created_at);
+                        if(existingCreatedAt.getTime() < newTodoCreatedAt.getTime()) {
+                            added = true;
+                            todoTableBody.insertBefore(newRow, row);
+                            break;
+                        }
+                        if(!added) {//まだ追加されていなかった場合（未完了リストにある全てのTODOの作成日よりも前だった場合）
+                            todoTableBody.appendChild(newRow);
+                        }
+                    }
+                }
+            } else {
+                todoTableBody.insertBefore(newRow, todoTableBody.firstChild);
             }
         }
-        const firstTodayMessage = document.getElementById('first-today-todo-message');
-        if(firstTodayMessage) firstTodayMessage.remove();//初期メッセージを削除
-        todoTableBody.insertBefore(newRow, todoTableBody.firstChild);//todoTableBodyの一番上に追加
     }
 }
