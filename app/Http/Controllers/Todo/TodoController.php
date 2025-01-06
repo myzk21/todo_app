@@ -34,35 +34,26 @@ class TodoController extends Controller
         $user_id = Auth::id();
 
         $google_user = GoogleUser::where('user_id', $user_id)->first();
+        $keyWord = $request->input('keyWord');
 
-        $all_todos = Todo::query()
-        ->where('user_id', $user_id)
-        ->orderBy('created_at', 'desc')
-        ->get();
-        //メインに表示
-        //期日なしー＞未完了＋完了したのが今日
-        //期日ありー＞未完了＋期日が今日＋完了したのが今日+期限切れ
-        $today_todos = $all_todos->filter(function ($todo) {
-            $dueDate = Carbon::parse($todo->due);
-            $completedDate = Carbon::parse($todo->when_completed);
-            return (is_null($todo->when_completed) && $dueDate->isToday()) || //未完了で期日が今日
-                    ($completedDate->isToday() && is_null($todo->due)) || //今日完了したが期日がない
-                    (is_null($todo->when_completed) && is_null($todo->due)) || //期日なしかつ未完了
-                    (is_null($todo->when_completed) && $dueDate->isPast()) || //未完了で遅れたタスク
-                    ($dueDate->isPast() && $completedDate->isToday()) || //遅れたタスク＋今日完了したもの
-                    ($dueDate->isToday() && $completedDate->isToday()); //期日が今日かつ今日完了
-        });
-        //期日が今日以外のTodo
-        //期日あり＋未完了で期日が今日以外＋期日今日以外で完了したのが今日
-        $not_today_todos = $all_todos->filter(function ($todo) {
-            $dueDate = Carbon::parse($todo->due);
-            $completedDate = Carbon::parse($todo->when_completed);
-            return
-            $dueDate->isFuture() && //期日が今日以降
-            (is_null($todo->when_completed) || $completedDate->isToday());//期日が今日以降かつ未完了or今日完了した
-        })->sortBy(function ($todo) {
-            return $todo->due; // 期日で並べ替え
-        });
+        $incompleteQuery = Todo::query()
+            ->where('user_id', $user_id)
+            ->where('is_completed', false)
+            ->orderBy('created_at', 'desc');
+        if(!empty($keyWord)) {
+            $incompleteQuery->where('title', 'like', '%' . trim($keyWord) . '%');
+        }
+        $incompleteTodos = $incompleteQuery->paginate(10)->appends(['keyWord' => $keyWord]);
+
+        $completeQuery = Todo::query()
+            ->where('user_id', $user_id)
+            ->where('is_completed', true)
+            ->orderBy('when_completed', 'desc');
+
+        if(!empty($keyWord)) {
+            $completeQuery->where('title', 'like', '%' . trim($keyWord) . '%');
+        }
+        $completeTodos = $completeQuery->paginate(10)->appends(['keyWord' => $keyWord]);
 
         $weeklyGoal = WeeklyGoal::query()
         ->where('user_id', $user_id)
@@ -72,7 +63,7 @@ class TodoController extends Controller
         ->where('user_id', $user_id)
         ->orderBy('created_at', 'desc')
         ->first();
-        return view('todo.list', compact('today_todos', 'not_today_todos', 'weeklyGoal', 'monthlyGoal', 'google_user'));
+        return view('todo.list', compact('incompleteTodos', 'completeTodos', 'weeklyGoal', 'monthlyGoal', 'google_user', 'keyWord'));
     }
 
     /**
@@ -108,7 +99,7 @@ class TodoController extends Controller
             $todo->title = $posts['title'];
             $todo->description = $posts['description'];
             $todo->due = $posts['due'];
-            $todo->when_completed = null;
+            $todo->is_completed = false;
             $todo->progress_rate = $posts['progress_rate'];
             $todo->priority = $posts['priority'];
             $todo->event_id = isset($event) ? $event->id : null;
@@ -218,10 +209,12 @@ class TodoController extends Controller
     public function changeTodoStatus(string $id)
     {
         $todo = Todo::findOrFail($id);
-        if($todo->when_completed) {
+        if($todo->is_completed) {
+            $todo->is_completed = false;
             $todo->when_completed = null;
         } else {
-            $todo->when_completed = Carbon::today();
+            $todo->is_completed = true;
+            $todo->when_completed = Carbon::now();
         }
         $todo->save();
         return response()->json([

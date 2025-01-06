@@ -56,4 +56,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 10);
         downArrow.classList.toggle('custom-rotate-180');//矢印回転
     });
+    //未完了、完了タブの切り替え
+    const incompleteTab = document.getElementById('incompleteTask_tab') as HTMLElement;
+    const completeTab = document.getElementById('completeTask_tab') as HTMLElement;
+    const incompleteTaskContainer =  document.getElementById('incompleteTaskContainer') as HTMLElement;
+    const completeTaskContainer =  document.getElementById('completeTaskContainer') as HTMLElement;
+
+    incompleteTab.addEventListener('click', () => {
+        incompleteTaskContainer.classList.remove('hidden');
+        completeTaskContainer.classList.add('hidden');
+        incompleteTab.classList.remove('text-gray-500', 'hover:opacity-60');
+        incompleteTab.classList.add('active');
+        completeTab.classList.remove('active');
+        completeTab.classList.add('text-gray-500', 'hover:opacity-60');
+    });
+    completeTab.addEventListener('click', () => {
+        incompleteTaskContainer.classList.add('hidden');
+        completeTaskContainer.classList.remove('hidden');
+        completeTab.classList.remove('text-gray-500', 'hover:opacity-60');
+        completeTab.classList.add('active');
+        incompleteTab.classList.remove('active');
+        incompleteTab.classList.add('text-gray-500', 'hover:opacity-60');
+    });
 });
