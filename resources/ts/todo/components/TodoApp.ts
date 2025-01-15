@@ -85,6 +85,9 @@ export class TodoApp {
                         <p class="text-white font-semibold">システムエラーが発生しました</p>
                         <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
                     </div>`;
+                    setTimeout(() => {
+                        errorContainer.innerHTML = ''; // 3秒後に非表示
+                    }, 3000);
                 }
             }
         });
@@ -129,6 +132,9 @@ export class TodoApp {
                 <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
             </div>`;
             this.addButton.disabled = false;
+            setTimeout(() => {
+                errorContainer.innerHTML = ''; // 3秒後に非表示
+            }, 3000);
             console.error('Todoの追加に失敗しました');
         }
     }
@@ -170,8 +176,8 @@ export class TodoApp {
     }
 
     // Todoの更新処理
-    private async updateTodo(addButton: HTMLButtonElement) {
-        addButton.disabled = true;
+    private async updateTodo(updateButton: HTMLButtonElement) {
+        updateButton.disabled = true;
         const todoUpdateForm = document.getElementById('todo_update_form') as HTMLFormElement;
         const updateFormData = new FormData(todoUpdateForm);
         updateFormData.append('_token', csrfToken);
@@ -179,7 +185,7 @@ export class TodoApp {
         try {
             const updateTodo: Todo = await TodoService.updateTodo(updateFormData);//サービスクラスを呼び出してTodoを追加
             this.renderTodo(updateTodo);
-            addButton.disabled = false;
+            updateButton.disabled = false;
             this.todoDetailModal.innerHTML = '';
             const userActionDialog = document.getElementById('user_action_dialog') as HTMLElement;
             userActionDialog.classList.remove('hidden');
@@ -199,7 +205,10 @@ export class TodoApp {
                 <p class="text-white font-semibold">TODOの更新に失敗しました</p>
                 <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
             </div>`;
-            this.addButton.disabled = false;
+            updateButton.disabled = false;
+            setTimeout(() => {
+                errorContainer.innerHTML = ''; // 3秒後に非表示
+            }, 3000);
             console.error('Todoの更新に失敗しました');
         }
     }
@@ -235,6 +244,9 @@ export class TodoApp {
                             <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
                         </div>`;
                         deleteBtn.classList.remove('pointer-events-none');
+                        setTimeout(() => {
+                            errorContainer.innerHTML = ''; // 3秒後に非表示
+                        }, 3000);
                         console.error('Todoの削除に失敗しました');
                     }
                 }
@@ -312,10 +324,10 @@ export class TodoApp {
             this.todoDetailModal.innerHTML = '';
         });
 
-        const addButton = document.getElementById('todo_update_btn') as HTMLButtonElement;
-        addButton.addEventListener('click', (event: MouseEvent) => {
+        const updateButton = document.getElementById('todo_update_btn') as HTMLButtonElement;
+        updateButton.addEventListener('click', (event: MouseEvent) => {
             event.preventDefault();
-            this.updateTodo(addButton);//TODOの更新
+            this.updateTodo(updateButton);//TODOの更新
         });
         //詳細画面での削除
         const deleteButton = document.querySelector('.todo_delete_btn') as HTMLElement;
@@ -347,6 +359,9 @@ export class TodoApp {
                 </div>`;
                 deleteButton.classList.remove('pointer-events-none');
                 if(this.todoDetailModal)this.todoDetailModal.innerHTML = '';
+                setTimeout(() => {
+                    errorContainer.innerHTML = ''; // 4秒後に非表示
+                }, 4000);
                 console.error('Todoの削除に失敗しました');
             }
         });
