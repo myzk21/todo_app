@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     connectToGoogleBtn.addEventListener('click', (event: MouseEvent) => {
         const isConfirmed = confirm('Googleアカウントの再接続をしますか？');
         if(!isConfirmed) {
-            return;
+            event.preventDefault();
         }
     });
 
