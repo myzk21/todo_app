@@ -4,7 +4,17 @@ import { Todo } from '../classes/Todo';
 export class TodoService {
     static async changeTodoStatus(todoId: string | null): Promise<Todo> {
         try {
-            const response: AxiosResponse<{ success: boolean, todo: Todo }> = await axios.patch(`/changeTodoStatus/${todoId}`);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (!csrfToken) {
+                throw new Error('CSRFトークンが見つかりません。');
+            }
+            const response: AxiosResponse<{ success: boolean, todo: Todo }> = await axios.patch(
+                `/changeTodoStatus/${todoId}`, {},
+            {
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+            });
             return response.data.todo;
         } catch(error){
             throw new Error('Todoの更新に失敗しました');
@@ -13,7 +23,18 @@ export class TodoService {
 
     static async addTodo(formData: FormData): Promise<Todo> {//todo追加
         try {
-            const response: AxiosResponse<{ success: boolean, message: string, todo: Todo }> = await axios.post('/add_todo', formData);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (!csrfToken) {
+                throw new Error('CSRFトークンが見つかりません。');
+            }
+            const response: AxiosResponse<{ success: boolean, message: string, todo: Todo }> = await axios.post(
+                '/add_todo',
+                formData,
+            {
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+            });
             return response.data.todo;
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
@@ -39,9 +60,14 @@ export class TodoService {
     static async updateTodo(updateFormData: FormData): Promise<Todo> {
         try {
             const todoId = updateFormData.get('id');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (!csrfToken) {
+                throw new Error('CSRFトークンが見つかりません。');
+            }
             const response = await axios.patch(`/update_todo/${todoId}`, updateFormData, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
                 }
             });
             return response.data.todo;
@@ -60,7 +86,18 @@ export class TodoService {
     //削除処理
     static async deleteTodo(todoId: string | null): Promise<Todo> {
         try {
-            const response: AxiosResponse<{ success: boolean, todo: Todo }> = await axios.delete(`/delete_todo/${todoId}`);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (!csrfToken) {
+                throw new Error('CSRFトークンが見つかりません。');
+            }
+            const response: AxiosResponse<{ success: boolean, todo: Todo }> = await axios.delete(
+                `/delete_todo/${todoId}`,
+                {
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                }
+            );
             return response.data.todo;
         } catch (error) {
             throw new Error('Todoの削除に失敗しました');

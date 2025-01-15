@@ -200,7 +200,6 @@ export class TodoApp {
                 <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
             </div>`;
             this.addButton.disabled = false;
-            this.todoDetailModal.innerHTML = '';
             console.error('Todoの更新に失敗しました');
         }
     }

@@ -13,6 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const connectToGoogleBtn = document.getElementById('connectToGoogle') as HTMLElement;
+    connectToGoogleBtn.addEventListener('click', (event: MouseEvent) => {
+        const isConfirmed = confirm('Googleアカウントの再接続をしますか？');
+        if(!isConfirmed) {
+            return;
+        }
+    });
+
     //以下月間目標表示処理
     const checkBox = document.getElementById('monthly_check_box') as HTMLInputElement;
     const monthlyGoal = document.getElementById('monthly_goal') as HTMLElement;
