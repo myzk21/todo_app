@@ -52,11 +52,14 @@
                         </div>
                     </label>
                     @if($google_user && $google_user->access_token && $google_user->refresh_token && !session()->has('invalidRefreshToken'))
-                        <p class="text-green-600 flex items-center text-sm select-none">Googleアカウント接続済み
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                        </p>
+                        <div class="flex">
+                            <p class="text-green-600 flex items-center text-sm select-none mr-1">Googleアカウント接続済み
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            </p>
+                            <a class="text-xs bg-gray-200 rounded shadow-sm p-1 m-1 cursor-pointer hover:underline hover:opacity-80" href="{{ route('google.redirect') }}" id="connectToGoogle">再接続</a>
+                        </div>
                     @else
                         <a class="flex items-center px-2 py-1 text-sm text-green-600 font-semibold bg-white hover:bg-gray-100 mb-1 rounded-md  select-none cursor-pointer" href="{{ route('google.redirect') }}" id="connectToGoogle">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mr-1">
