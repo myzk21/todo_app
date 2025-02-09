@@ -71,6 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const completeTaskContainer =  document.getElementById('completeTaskContainer') as HTMLElement;
 
     incompleteTab.addEventListener('click', () => {
+        const url = new URL(window.location.href);
+        const page = url.searchParams.get('page');
+        if (page) {
+            url.searchParams.delete('page');
+            window.location.href = url.toString();
+        }
+        sessionStorage.setItem("activeTab", "incomplete");
         incompleteTaskContainer.classList.remove('hidden');
         completeTaskContainer.classList.add('hidden');
         incompleteTab.classList.remove('text-gray-500', 'hover:opacity-60');
@@ -79,6 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
         completeTab.classList.add('text-gray-500', 'hover:opacity-60');
     });
     completeTab.addEventListener('click', () => {
+        const url = new URL(window.location.href);
+        const page = url.searchParams.get('page');
+        if (page) {
+            url.searchParams.delete('page');
+            window.location.href = url.toString();
+        }
+        sessionStorage.setItem("activeTab", "complete");
         incompleteTaskContainer.classList.add('hidden');
         completeTaskContainer.classList.remove('hidden');
         completeTab.classList.remove('text-gray-500', 'hover:opacity-60');
@@ -86,4 +100,20 @@ document.addEventListener('DOMContentLoaded', () => {
         incompleteTab.classList.remove('active');
         incompleteTab.classList.add('text-gray-500', 'hover:opacity-60');
     });
+    //セッションに保存されている方のタブをアクティブにする
+    if (sessionStorage.getItem('activeTab') && sessionStorage.getItem('activeTab') == 'incomplete') {
+        incompleteTaskContainer.classList.remove('hidden');
+        completeTaskContainer.classList.add('hidden');
+        incompleteTab.classList.remove('text-gray-500', 'hover:opacity-60');
+        incompleteTab.classList.add('active');
+        completeTab.classList.remove('active');
+        completeTab.classList.add('text-gray-500', 'hover:opacity-60');
+    } else if(sessionStorage.getItem('activeTab') && sessionStorage.getItem('activeTab') == 'complete') {
+        incompleteTaskContainer.classList.add('hidden');
+        completeTaskContainer.classList.remove('hidden');
+        completeTab.classList.remove('text-gray-500', 'hover:opacity-60');
+        completeTab.classList.add('active');
+        incompleteTab.classList.remove('active');
+        incompleteTab.classList.add('text-gray-500', 'hover:opacity-60');
+    }
 });

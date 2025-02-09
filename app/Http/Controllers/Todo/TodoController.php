@@ -65,7 +65,34 @@ class TodoController extends Controller
         ->first();
         return view('todo.list', compact('incompleteTodos', 'completeTodos', 'weeklyGoal', 'monthlyGoal', 'google_user', 'keyWord'));
     }
+///以下は非同期でタスク一覧を表示させようと試みた際に作成した。削除しても問題ない
+    // public function fetchData(Request $request, $type)
+    // {
+    //     $user_id = Auth::id();
+    //     $keyWord = $request->input('keyWord');
+    //     $result = null;
+    //     if($type == 'incomplete') {
+    //         $incompleteQuery = Todo::query()
+    //         ->where('user_id', $user_id)
+    //         ->where('is_completed', false)
+    //         ->orderBy('created_at', 'desc');
+    //         if(!empty($keyWord)) {
+    //             $incompleteQuery->where('title', 'like', '%' . trim($keyWord) . '%');
+    //         }
+    //         $result = $incompleteQuery->paginate(10)->appends(['keyWord' => $keyWord]);
+    //     } else if($type == 'complete') {
+    //         $completeQuery = Todo::query()
+    //         ->where('user_id', $user_id)
+    //         ->where('is_completed', true)
+    //         ->orderBy('when_completed', 'desc');
 
+    //         if(!empty($keyWord)) {
+    //             $completeQuery->where('title', 'like', '%' . trim($keyWord) . '%');
+    //         }
+    //         $result = $completeQuery->paginate(10)->appends(['keyWord' => $keyWord]);
+    //     }
+    //     return response()->json($result);
+    // }
     /**
      * Show the form for creating a new resource.
      */
