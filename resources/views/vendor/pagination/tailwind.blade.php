@@ -80,6 +80,9 @@
                                     @endphp
                                 @endwhile
                             @endif
+                            @if($maxNum != 10)
+                                <a href="{{ url('/') }}" class="relative inline-flex items-center rounded my-1 px-2 py-1 -ml-px font-medium text-gray-800 bg-white leading-5 hover:bg-gray-200 focus:z-10 focus:outline-none focus:ring ring-gray-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">...</a>
+                            @endif
                             @foreach ($element as $page => $url)
                                 @if($page >= $maxNum - 9 && $page <= $maxNum)
                                     @if ($page == $paginator->currentPage())
@@ -94,7 +97,7 @@
                                 @endif
                             @endforeach
                             @if($maxNum < count($element))
-                                <p>...</p>
+                                <a href="{{ url('/') }}?page={{ $maxNum + 1 }}" class="relative inline-flex items-center rounded my-1 px-2 py-1 -ml-px font-medium text-gray-800 bg-white leading-5 hover:bg-gray-200 focus:z-10 focus:outline-none focus:ring ring-gray-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">...</a>
                             @endif
                         @endif
                     @endforeach
