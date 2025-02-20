@@ -196,7 +196,7 @@
                                 @endif
                             </tbody>
                         </table>
-                        {{ $incompleteTodos->links() }}
+                        {{ $incompleteTodos->links('vendor.pagination.tailwind') }}
                     </div>
                     <div class="hidden" id="completeTaskContainer">
                         <table class="w-full text-left table-auto" id="completeTaskTable">
@@ -249,7 +249,7 @@
                                 @endif
                             </tbody>
                         </table>
-                        {{ $completeTodos->links() }}
+                        {{ $completeTodos->links('vendor.pagination.tailwind') }}
                     </div>
                 </div>
             </div>
