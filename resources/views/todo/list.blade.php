@@ -1,7 +1,9 @@
 <x-app-layout>
     @section('load-vite-todo-script', true) {{--TODOに関するTSを使用--}}
 
-    <section class="bg-gray-50 px-8 py-5">
+    @include('todo.components.small_width_create_form'){{--スマホ用作成モーダル--}}
+
+    <section class="bg-gray-50 px-8 py-5 max-sm:px-4 max-sm:py-1">
         @if(session()->has('invalidRefreshToken'))
             <script>
                 window.onload = function() {
@@ -28,26 +30,27 @@
 
         @if($weeklyGoal && $monthlyGoal)
             @if($weeklyGoal->due < now()->format('Y-m-d') && $monthlyGoal->due < now()->format('Y-m-d'))
-                <div id="notice" class="text-red-500">
+                <div id="notice" class="text-red-500 max-sm:hidden">
                     新しい週間目標、月間目標を設定しましょう
                 </div>
             @elseif($weeklyGoal->due < now()->format('Y-m-d'))
-                <div id="notice" class="text-red-500">
+                <div id="notice" class="text-red-500 max-sm:hidden">
                     新しい週間目標を設定しましょう
                 </div>
             @elseif($monthlyGoal->due < now()->format('Y-m-d'))
-                <div id="notice" class="text-red-500">
+                <div id="notice" class="text-red-500 max-sm:hidden">
                     新しい月間目標を設定しましょう
                 </div>
             @endif
         @endif
         <div class=""  id="todo_list">
             <div class="container mx-auto">
-                <div class="flex justify-between">
+                {{--下記640px以上で表示--}}
+                <div class="flex justify-between max-sm:hidden">
                     <label class="toggle-switch inline-block">
                         <div class="flex">
                             <p class="text-sm mr-1 select-none">月間目標を表示</p>
-                            <input type="checkbox" id="monthly_check_box">
+                            <input type="checkbox" class="monthly_check_box">
                             <span class="mb-2"></span>
                         </div>
                     </label>
@@ -68,14 +71,57 @@
                         Googleアカウントに接続</a>
                     @endif
                 </div>
+                {{--下記640px以下で表示--}}
+                <div class="hidden max-sm:block">
+                    @if($google_user && $google_user->access_token && $google_user->refresh_token && !session()->has('invalidRefreshToken'))
+                        <div class="flex justify-end">
+                            <p class="text-green-600 flex items-center text-sm select-none mr-1">Googleアカウント接続済み
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            </p>
+                            <a class="text-xs bg-gray-200 rounded shadow-sm p-1 m-1 cursor-pointer hover:underline hover:opacity-80" href="{{ route('google.redirect') }}" id="connectToGoogle">再接続</a>{{--IDの重複--}}
+                        </div>
+                    @else
+                        <a class="flex items-center px-2 py-2 text-sm text-green-600 font-semibold shadow bg-white hover:bg-gray-100 mb-3 rounded-md  select-none cursor-pointer" href="{{ route('google.redirect') }}" id="connectToGoogle">{{--IDの重複--}}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mr-1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
+                        Googleアカウントに接続する</a>
+                    @endif
+                    @if($weeklyGoal && $monthlyGoal)
+                        @if($weeklyGoal->due < now()->format('Y-m-d') && $monthlyGoal->due < now()->format('Y-m-d'))
+                            <div id="notice" class="text-red-500">
+                                新しい週間目標、月間目標を設定しましょう
+                            </div>
+                        @elseif($weeklyGoal->due < now()->format('Y-m-d'))
+                            <div id="notice" class="text-red-500">
+                                新しい週間目標を設定しましょう
+                            </div>
+                        @elseif($monthlyGoal->due < now()->format('Y-m-d'))
+                            <div id="notice" class="text-red-500">
+                                新しい月間目標を設定しましょう
+                            </div>
+                        @endif
+                    @endif
+                    <label class="toggle-switch inline-block">
+                        <div class="flex">
+                            <p class="text-sm mr-1 select-none">月間目標を表示</p>
+                            <input type="checkbox" class="monthly_check_box">
+                            <span class="mb-2"></span>
+                        </div>
+                    </label>
+                </div>
+
                 <div class="w-full mb-5 bg-white px-6 py-3">
                     <div class="flex mb-1">
-                        <h2 class="text-xl font-bold">Weekly Goal / 週間目標</h2>
-                        <a href="{{route('pdca')}}" class="ml-auto cursor-pointer text-gray-500 text-sm flex hover:underline select-none">作成
+                        <h2 class="text-xl font-bold max-sm:text-lg">Weekly Goal / 週間目標</h2>
+                        <a href="{{route('pdca')}}" class="ml-auto cursor-pointer text-gray-500 text-sm flex hover:underline select-none max-sm:hidden">作成
                         </a>
                     </div>
                     @if($weeklyGoal)
-                        <p class="text-gray-700">{{ $weeklyGoal['title'] }}</p>
+                        <p class="text-gray-700 max-sm:hidden">{{ $weeklyGoal['title'] }}</p>
+                        <p class="text-gray-700 hidden max-sm:block">{{ mb_strimwidth($weeklyGoal['title'], 0, 37, '...') }}</p>
                         <p class="text-sm text-gray-700 underline text-right">期日: {{ $weeklyGoal['due'] }}</p>
                     @else
                         <p class="text-gray-700">週間目標はまだ設定されていません</p>
@@ -84,12 +130,13 @@
                     <div class="hidden" id="monthly_goal">
                         <div class="border border-gray-200 my-4"></div>
                         <div class="flex mb-1">
-                            <h2 class="text-xl font-bold">Monthly Goal / 月間目標</h2>
-                            <a href="{{route('pdca')}}" class="ml-auto cursor-pointer text-gray-500 text-sm flex hover:underline select-none">作成
+                            <h2 class="text-xl font-bold max-sm:text-lg">Monthly Goal / 月間目標</h2>
+                            <a href="{{route('pdca')}}" class="ml-auto cursor-pointer text-gray-500 text-sm flex hover:underline select-none max-sm:hidden">作成
                             </a>
                         </div>
                         @if($monthlyGoal)
-                            <p class="text-gray-700">{{ $monthlyGoal['title'] }}</p>
+                            <p class="text-gray-700 max-sm:hidden">{{ $monthlyGoal['title'] }}</p>
+                            <p class="text-gray-700 hidden max-sm:block">{{ mb_strimwidth($monthlyGoal['title'], 0, 37, '...') }}</p>
                             <p class="text-sm text-gray-700 underline text-right">期日: {{ $monthlyGoal['due'] }}</p>
                         @else
                             <p class="text-gray-700">月間目標はまだ設定されていません</p>
@@ -97,7 +144,7 @@
                     </div>
                 </div>
                 {{--TODOリスト--}}
-                <form action="" method="POST" class="shadow-sm mb-5 py-4 bg-white rounded-lg w-full overflow-x-auto" id="todo_create_form">
+                <form action="" method="POST" class="shadow-sm mb-5 py-4 bg-white rounded-lg w-full overflow-x-auto max-sm:hidden" id="todo_create_form">
                     @csrf
                     <div id="errorContainer"></div> {{--バリデーションエラー表示--}}
 
@@ -113,6 +160,14 @@
                     </div>
                     @include('todo.components.create_form'){{--詳細フォームを読み込み--}}
                 </form>
+
+                <p class="mx-auto my-3 px-6 w-full items-center bg-green-700 text-white text-sm py-2 rounded hover:bg-opacity-80 select-none cursor-pointer flex hidden max-sm:block" id="open_smartphone_add_modal">
+                    {{-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+                        <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                    </svg> --}}
+                    TODOを作成
+                </p>{{--スマホ画面用ボタン--}}
+
                 <div class="bg-white shadow-sm rounded-lg w-full overflow-x-auto">
                     <div class="flex my-3">
                         <ul class="flex border-b">

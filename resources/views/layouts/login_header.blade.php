@@ -4,7 +4,7 @@
             @auth
                 <form method="POST" action="{{ route('logout') }}" class="w-full flex justify-end">
                     @csrf
-                    <button type="submit" class="mr-3 hover:underline">
+                    <button type="submit" class="mr-3 hover:underline max-sm:text-xs">
                         ログアウト
                     </button>
                 </form>

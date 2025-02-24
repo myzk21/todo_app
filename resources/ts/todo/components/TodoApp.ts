@@ -7,39 +7,51 @@ const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMeta
 
 export class TodoApp {
     private addButton: HTMLButtonElement;
+    private openSmartPhoneAddModal: HTMLButtonElement;
+    private smallWidthAddButton: HTMLButtonElement;
     private todoCreateForm: HTMLFormElement;
-    private todoTitleInput: HTMLInputElement;
-    private todoDescriptionInput: HTMLInputElement;
-    private percentage: HTMLInputElement;
-    private priority: HTMLInputElement;
-    private due: HTMLInputElement;
+    private smallWidthTodoCreateForm: HTMLFormElement;
+
     private todoDetailModal = document.getElementById('todo_detail_modal') as HTMLElement;
     private addToCalendarCheckbox = document.getElementById('addToCalendarCheckbox') as HTMLInputElement;
 
     constructor(
         addButtonId: string,
+        openSmartPhoneAddModalId: string,
+        smallWidthAddButtonId: string,
         todoCreateFormId: string,
-        todoTitleInputId: string,
-        todoDescriptionInputId: string,
-        percentageId: string,
-        priorityId: string,
-        dueId: string
+        smallWidthTodoCreateFormId: string,
     ) {
         this.addButton = document.getElementById(addButtonId) as HTMLButtonElement;
+        this.openSmartPhoneAddModal = document.getElementById(openSmartPhoneAddModalId) as HTMLButtonElement;
+        this.smallWidthAddButton = document.getElementById(smallWidthAddButtonId) as HTMLButtonElement;
         this.todoCreateForm = document.getElementById(todoCreateFormId) as HTMLFormElement;
-        this.todoTitleInput = document.getElementById(todoTitleInputId) as HTMLInputElement;
-        this.todoDescriptionInput = document.getElementById(todoDescriptionInputId) as HTMLInputElement;
-        this.percentage = document.getElementById(percentageId) as HTMLInputElement;
-        this.priority = document.getElementById(priorityId) as HTMLInputElement;
-        this.due = document.getElementById(dueId) as HTMLInputElement;
+        this.smallWidthTodoCreateForm = document.getElementById(smallWidthTodoCreateFormId) as HTMLFormElement;
 
-        this.addButton.addEventListener('click', (event) => {//clickされたらaddTodoを実行
+        this.addButton.addEventListener('click', (event) => {
             event.preventDefault();
-            this.addTodo();
+            this.addTodo(this.addButton, this.todoCreateForm, "wide");
+        });
+        this.openSmartPhoneAddModal.addEventListener('touchstart', (event) => {
+            event.preventDefault();
+            this.displaySmartPhoneModal();
         });
         this.changeTodoStatus();
         this.showTodo();
         this.deleteTodo();
+    }
+
+    private displaySmartPhoneModal() {
+        let smartPhoneCreateModal = document.getElementById('small_width_todo_create_form') as HTMLElement;
+        let closeModal = document.getElementById('close_smart_modal') as HTMLElement;
+        smartPhoneCreateModal.classList.remove('hidden');
+        closeModal.addEventListener('click', () => {
+            smartPhoneCreateModal.classList.add('hidden');
+        });
+        this.smallWidthAddButton.addEventListener('touchstart', (event) => {
+            event.preventDefault();
+            this.addTodo(this.smallWidthAddButton, this.smallWidthTodoCreateForm, "narrow");//TODOの追加
+        });
     }
 
     //todo完了処理
@@ -94,25 +106,34 @@ export class TodoApp {
     }
 
     // Todoの追加処理
-    private async addTodo() {
-        this.addButton.disabled = true;
-        const formData = new FormData(this.todoCreateForm);
+    private async addTodo(addBtn: HTMLButtonElement, form: HTMLFormElement, displayWidth: string) {
+        addBtn.disabled = true;
+
+        const formData = new FormData(form);
+
         formData.append('_token', csrfToken);
         if (!formData) return;
         try {
-            const newTodo: Todo = await TodoService.addTodo(formData);//サービスクラスを呼び出してTodoを追加
-            const errorContainer = document.getElementById('errorContainer') as HTMLElement;
+            const newTodo: Todo = await TodoService.addTodo(formData, displayWidth);//サービスクラスを呼び出してTodoを追加
+            let errorContainer: HTMLElement | null = null;
+            if (displayWidth == "wide") {
+                errorContainer = document.getElementById('errorContainer') as HTMLElement;
+            } else if (displayWidth == "narrow") {
+                errorContainer = document.getElementById('smallWidthErrorContainer') as HTMLElement;
+            }
             this.renderTodo(newTodo);
-            this.todoTitleInput.value = ''; //入力フィールドをクリア
-            this.todoDescriptionInput.value = '';
-            this.percentage.value = '';
-            this.priority.value = '';
-            this.due.value = '';
-            this.addButton.disabled = false;
+            form.reset();//入力フィールドをクリア
+            addBtn.disabled = false;
             if (this.addToCalendarCheckbox.checked) {
                 this.addToCalendarCheckbox.checked = false; // チェックを外す
             }
-            errorContainer.innerHTML = ''; //既存のエラーをクリア
+            if (errorContainer) {
+                errorContainer.innerHTML = ''; //既存のエラーをクリア
+            }
+            if (displayWidth == "narrow") {
+                let smartPhoneCreateModal = document.getElementById('small_width_todo_create_form') as HTMLElement;
+                smartPhoneCreateModal.classList.add('hidden');
+            }
             const userActionDialog = document.getElementById('user_action_dialog') as HTMLElement;
             userActionDialog.classList.remove('hidden');
             userActionDialog.textContent = `「${newTodo.title}」を追加しました`;

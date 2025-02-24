@@ -21,7 +21,7 @@ export class TodoService {
         }
     }
 
-    static async addTodo(formData: FormData): Promise<Todo> {//todo追加
+    static async addTodo(formData: FormData, displayWidth: string): Promise<Todo> {//todo追加
         try {
             let token = await fetchToken();
             // const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -41,7 +41,7 @@ export class TodoService {
             if (axios.isAxiosError(error) && error.response) {
                 // バリデーションエラーの処理
                 const validationErrors = error.response.data.errors;
-                displayCreateValidationErrors(validationErrors);
+                displayCreateValidationErrors(validationErrors, displayWidth);
             } else {
                 console.error('リクエスト中にエラーが発生しました', error);
             }
@@ -112,18 +112,25 @@ async function fetchToken() {
         .then(data => data.token);
 }
 
-function displayCreateValidationErrors(errors: any) {
-    const errorContainer = document.getElementById('errorContainer') as HTMLElement;
-    errorContainer.innerHTML = ''; //既存のエラーをクリア
-    Object.keys(errors).forEach(field => { //エラーメッセージを1つずつ表示
-        const fieldErrors = errors[field];
-        fieldErrors.forEach((message: string) => {
-            const errorElement = document.createElement('div');
-            errorElement.className = 'text-sm text-red-500 ml-2 mt-1';
-            errorElement.innerText = message;
-            errorContainer.appendChild(errorElement);
+function displayCreateValidationErrors(errors: any, displayWidth: string) {
+    let errorContainer: HTMLElement | null = null;
+    if (displayWidth == "wide") {
+        errorContainer = document.getElementById('errorContainer') as HTMLElement;
+    } else if(displayWidth == "narrow") {
+        errorContainer = document.getElementById('smallWidthErrorContainer') as HTMLElement;
+    }
+    if (errorContainer) {
+        errorContainer.innerHTML = ''; //既存のエラーをクリア
+        Object.keys(errors).forEach(field => { //エラーメッセージを1つずつ表示
+            const fieldErrors = errors[field];
+            fieldErrors.forEach((message: string) => {
+                const errorElement = document.createElement('div');
+                errorElement.className = 'text-sm text-red-500 ml-2 mt-1';
+                errorElement.innerText = message;
+                errorContainer.appendChild(errorElement);
+            });
         });
-    });
+    }
 }
 
 function displayUpdateValidationErrors(errors: any) {
