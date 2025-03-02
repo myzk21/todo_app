@@ -2,7 +2,7 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('login') }}" class="max-sm:h-screen">
         @csrf
 
         <h2 class="font-bold text-center">ログイン</h2>
@@ -33,15 +33,15 @@
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-auto" href="{{ route('register') }}">新規登録はこちら</a>
+        <div class="sm:flex items-center sm:justify-end mt-4">
+            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mr-auto max-sm:ml-auto" href="{{ route('register') }}">新規登録はこちら</a>
             {{-- @if (Route::has('password.request'))
                 <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
                     {{ __('Forgot your password?') }}
                 </a>
             @endif --}}
 
-            <x-primary-button class="ms-3">
+            <x-primary-button class="sm:ms-3 max-sm:block max-sm:w-full max-sm:mt-5">
                 {{ __('Log in') }}
             </x-primary-button>
         </div>

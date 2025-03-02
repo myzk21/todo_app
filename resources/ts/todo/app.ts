@@ -2,7 +2,8 @@ import { TodoApp } from './components/TodoApp';
 
 //ページが読み込まれた時にTodoAppを初期化
 document.addEventListener('DOMContentLoaded', () => {
-    const todoApp = new TodoApp('todo_add_btn', 'todo_create_form', 'todo_title_input', 'todo_description_input', 'percentage', 'priority', 'due');
+    const todoApp = new TodoApp('todo_add_btn', 'open_smartphone_add_modal', 'small_width_todo_add_btn', 'todo_create_form', 'small_width_todo_create_form');
+
 
     //システムエラーが表示された場合、クリックしてその要素を削除する
     const errorContainer = document.getElementById('systemErrorContainer') as HTMLElement;
@@ -13,34 +14,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const connectToGoogleBtn = document.getElementById('connectToGoogle') as HTMLElement;
-    connectToGoogleBtn.addEventListener('click', (event: MouseEvent) => {
-        const isConfirmed = confirm('Googleアカウントの再接続をしますか？');
-        if(!isConfirmed) {
-            event.preventDefault();
-        }
+    const connectToGoogleBtns = document.querySelectorAll<HTMLElement>('.connectToGoogle');
+    connectToGoogleBtns.forEach((e) => {
+        e.addEventListener('click', (event: MouseEvent) => {
+            const isConfirmed = confirm('Googleアカウントの再接続をしますか？');
+            if(!isConfirmed) {
+                event.preventDefault();
+            }
+        });
     });
 
     //以下月間目標表示処理
-    const checkBox = document.getElementById('monthly_check_box') as HTMLInputElement;
+    const checkBoxes = document.querySelectorAll('.monthly_check_box') as NodeListOf<HTMLInputElement>;
     const monthlyGoal = document.getElementById('monthly_goal') as HTMLElement;
 
     monthlyGoal.classList.add('opacity-0', 'transition-opacity', 'duration-500');
 
-    checkBox.addEventListener('change', () => {
-        if (checkBox.checked) {
-            //チェックボックスがチェックされた場合
-            monthlyGoal.style.display = 'block';
-            setTimeout(() => {
-                monthlyGoal.classList.remove('opacity-0');
-                monthlyGoal.classList.add('opacity-100');
-            }, 10);
-        } else {
-            monthlyGoal.classList.remove('opacity-100');
-            monthlyGoal.classList.add('opacity-0');
-            monthlyGoal.style.display = 'none';
-        }
+    checkBoxes.forEach((check) => {
+        check.addEventListener('change', () => {
+            if (check.checked) {
+                //チェックボックスがチェックされた場合
+                monthlyGoal.style.display = 'block';
+                setTimeout(() => {
+                    monthlyGoal.classList.remove('opacity-0');
+                    monthlyGoal.classList.add('opacity-100');
+                }, 10);
+            } else {
+                monthlyGoal.classList.remove('opacity-100');
+                monthlyGoal.classList.add('opacity-0');
+                monthlyGoal.style.display = 'none';
+            }
+        });
     });
+
     //TODO入力詳細の展開
     const detailBtn = document.getElementById('detail') as HTMLInputElement;
     const todoContent = document.getElementById('todo_content') as HTMLElement;
