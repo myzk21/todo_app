@@ -14,12 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const connectToGoogleBtn = document.getElementById('connectToGoogle') as HTMLElement;
-    connectToGoogleBtn.addEventListener('click', (event: MouseEvent) => {
-        const isConfirmed = confirm('Googleアカウントの再接続をしますか？');
-        if(!isConfirmed) {
-            event.preventDefault();
-        }
+    const connectToGoogleBtns = document.querySelectorAll<HTMLElement>('.connectToGoogle');
+    connectToGoogleBtns.forEach((e) => {
+        e.addEventListener('click', (event: MouseEvent) => {
+            const isConfirmed = confirm('Googleアカウントの再接続をしますか？');
+            if(!isConfirmed) {
+                event.preventDefault();
+            }
+        });
     });
 
     //以下月間目標表示処理

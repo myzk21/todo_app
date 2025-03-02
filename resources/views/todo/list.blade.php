@@ -3,7 +3,7 @@
 
     @include('todo.components.small_width_create_form'){{--スマホ用作成モーダル--}}
 
-    <section class="bg-gray-50 px-8 py-5 max-sm:px-4 max-sm:py-1">
+    <section class="bg-gray-50 px-8 py-5 max-sm:px-4 max-sm:py-3">
         @if(session()->has('invalidRefreshToken'))
             <script>
                 window.onload = function() {
@@ -61,10 +61,10 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
                             </p>
-                            <a class="text-xs bg-gray-200 rounded shadow-sm p-1 m-1 cursor-pointer hover:underline hover:opacity-80" href="{{ route('google.redirect') }}" id="connectToGoogle">再接続</a>
+                            <a class="text-xs bg-gray-200 rounded shadow-sm p-1 m-1 cursor-pointer hover:underline hover:opacity-80 connectToGoogle" href="{{ route('google.redirect') }}">再接続</a>
                         </div>
                     @else
-                        <a class="flex items-center px-2 py-1 text-sm text-green-600 font-semibold bg-white hover:bg-gray-100 mb-1 rounded-md  select-none cursor-pointer" href="{{ route('google.redirect') }}" id="connectToGoogle">
+                        <a class="flex items-center px-2 py-1 text-sm text-green-600 font-semibold bg-white hover:bg-gray-100 mb-1 rounded-md  select-none cursor-pointer connectToGoogle" href="{{ route('google.redirect') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mr-1">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                         </svg>
@@ -80,10 +80,10 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
                             </p>
-                            <a class="text-xs bg-gray-200 rounded shadow-sm p-1 m-1 cursor-pointer hover:underline hover:opacity-80" href="{{ route('google.redirect') }}" id="connectToGoogle">再接続</a>{{--IDの重複--}}
+                            <a class="text-xs bg-gray-200 rounded shadow-sm p-1 m-1 cursor-pointer hover:underline hover:opacity-80 connectToGoogle" href="{{ route('google.redirect') }}">再接続</a>
                         </div>
                     @else
-                        <a class="flex items-center px-2 py-2 text-sm text-green-600 font-semibold shadow bg-white hover:bg-gray-100 mb-3 rounded-md  select-none cursor-pointer" href="{{ route('google.redirect') }}" id="connectToGoogle">{{--IDの重複--}}
+                        <a class="flex items-center px-2 py-2 text-sm text-green-600 font-semibold shadow bg-white hover:bg-gray-100 mb-3 rounded-md  select-none cursor-pointer connectToGoogle" href="{{ route('google.redirect') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mr-1">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                         </svg>
@@ -161,25 +161,38 @@
                     @include('todo.components.create_form'){{--詳細フォームを読み込み--}}
                 </form>
 
-                <p class="mx-auto my-3 px-6 w-full items-center bg-green-700 text-white text-sm py-2 rounded hover:bg-opacity-80 select-none cursor-pointer flex hidden max-sm:block" id="open_smartphone_add_modal">
-                    {{-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+                <p class="mx-auto my-4 px-6 w-full bg-green-700 text-white text-sm py-2 rounded hover:bg-opacity-80 select-none cursor-pointer hidden max-sm:flex justify-center" id="open_smartphone_add_modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 mr-1">
                         <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
-                    </svg> --}}
+                    </svg>
                     TODOを作成
                 </p>{{--スマホ画面用ボタン--}}
 
-                <div class="bg-white shadow-sm rounded-lg w-full overflow-x-auto">
+                <div class="bg-white shadow-sm rounded-lg w-full overflow-x-auto max-sm:py-3">
+                    <!--検索フォーム（スマホ用）-->
+                    <div class="ml-2 mt-2 rounded bg-white flex hidden max-sm:block">
+                        <form action="{{ route('home') }}" method="GET" class="flex">
+                            @csrf
+                            <input type="text" placeholder="キーワードを入力" class="py-1 px-2 rounded focus:outline-none focus:ring-[#8b8a8e] placeholder:text-sm placeholder:text-gray-300" name="keyWord" value="{{ $keyWord ? $keyWord : '' }}">
+                            <button class="flex items-center text-green-800 cursor-pointer ml-1 hover:opacity-80" type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-9">
+                                    <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z" />
+                                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
                     <div class="flex my-3">
-                        <ul class="flex border-b">
-                            <li class="mr-1">
+                        <ul class="flex border-b max-sm:w-full">
+                            <li class="mr-1 max-sm:mr-0 max-sm:w-full text-center">
                                 <a href="#" class="inline-block py-1 px-6 whitespace-nowrap active" id="incompleteTask_tab">未完了のタスク</a>
                             </li>
-                            <li class="mr-1">
+                            <li class="mr-1 max-sm:mr-0 max-sm:w-full text-center">
                                 <a href="#" class="inline-block py-1 px-6 whitespace-nowrap text-gray-500 hover:opacity-60" id="completeTask_tab">完了したタスク</a>
                             </li>
                         </ul>
-                        <!--検索フォーム-->
-                        <div class="ml-auto rounded bg-white flex mr-3">
+                        <!--検索フォーム（パソコン用）-->
+                        <div class="ml-auto rounded bg-white flex mr-3 max-sm:hidden">
                         <!----------------------------ここから改良する
                             <p class="rounded-full border border-[#8b8a8e] bg-white py-1 px-2 cursor-pointer text-[#8b8a8e] hover:bg-green-700 hover:text-white select-none flex mr-2 items-center whitespace-nowrap">本日のタスク</p>{{---TSでclickされたら色をトグル--}}
 
@@ -206,12 +219,12 @@
                                 <tr class="border-b border-gray-100">
                                     <th class="px-4 py-3 text-gray-700 font-medium"></th>
                                     <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">タイトル</th>
-                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">内容</th>
-                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">進捗率</th>
-                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">優先度</th>
+                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none max-sm:hidden">内容</th>
+                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none max-sm:hidden">進捗率</th>
+                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none max-sm:hidden">優先度</th>
                                     <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">期日</th>
                                     <th class="px-4 py-3 text-gray-700 font-medium"></th>
-                                    <th class="px-4 py-3 text-gray-700 font-medium"></th>
+                                    <th class="px-4 py-3 text-gray-700 font-medium max-sm:hidden"></th>
                                 </tr>
                             </thead>
                             <tbody class="mb-3 incompleteTaskTableBody">
@@ -230,12 +243,12 @@
                                                 </label>
                                             </td>
                                             <td class="px-4 py-3 text-center title">{{ \Illuminate\Support\Str::limit($todo['title'], 15, '...') }}</td>
-                                            <td class="px-4 py-3 text-center description">{{ \Illuminate\Support\Str::limit($todo['description'], 15, '...') ?? '--' }}</td>
-                                            <td class="px-4 py-3 text-center progress_rate">{{ $todo['progress_rate'] ?? '--' }}%</td>
-                                            <td class="px-4 py-3 text-center priority">{{ $todo['priority'] ?? '--' }}</td>
+                                            <td class="px-4 py-3 text-center description max-sm:hidden">{{ \Illuminate\Support\Str::limit($todo['description'], 15, '...') ?? '--' }}</td>
+                                            <td class="px-4 py-3 text-center progress_rate max-sm:hidden">{{ $todo['progress_rate'] ?? '--' }}%</td>
+                                            <td class="px-4 py-3 text-center priority max-sm:hidden">{{ $todo['priority'] ?? '--' }}</td>
                                             <td class="px-4 py-3 text-center due">{{ $todo['due'] ?? '--' }}</td>
-                                            <td class="px-4 py-3 text-gray-500 text-sm hover:underline text-center"><a href="#" class="showBtn" todo-id="{{ $todo['id'] }}">詳細</a></td>
-                                            <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
+                                            <td class="px-4 py-3 text-gray-500 text-sm hover:underline text-center whitespace-nowrap"><a href="#" class="showBtn" todo-id="{{ $todo['id'] }}">詳細</a></td>
+                                            <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center max-sm:hidden">
                                                 <a href="#" class="todo_delete_btn" todo-id="{{ $todo['id'] }}">{{--ゴミ箱アイコン--}}
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5 text-gray-400">
                                                         <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
@@ -259,12 +272,12 @@
                                 <tr class="border-b border-gray-100">
                                     <th class="px-4 py-3 text-gray-700 font-medium"></th>
                                     <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">タイトル</th>
-                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">内容</th>
-                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">進捗率</th>
-                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">優先度</th>
+                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none max-sm:hidden">内容</th>
+                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none max-sm:hidden">進捗率</th>
+                                    <th class="px-4 py-3 text-gray-700 font-medium text-center select-none max-sm:hidden">優先度</th>
                                     <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">期日</th>
                                     <th class="px-4 py-3 text-gray-700 font-medium"></th>
-                                    <th class="px-4 py-3 text-gray-700 font-medium"></th>
+                                    <th class="px-4 py-3 text-gray-700 font-medium max-sm:hidden"></th>
                                 </tr>
                             </thead>
                             <tbody class="mb-3 completeTaskTableBody">
@@ -283,12 +296,12 @@
                                                 </label>
                                             </td>
                                             <td class="px-4 py-3 text-center title">{{ \Illuminate\Support\Str::limit($todo['title'], 15, '...') }}</td>
-                                            <td class="px-4 py-3 text-center description">{{ \Illuminate\Support\Str::limit($todo['description'], 15, '...') ?? '--' }}</td>
-                                            <td class="px-4 py-3 text-center progress_rate">{{ $todo['progress_rate'] ?? '--' }}%</td>
-                                            <td class="px-4 py-3 text-center priority">{{ $todo['priority'] ?? '--' }}</td>
+                                            <td class="px-4 py-3 text-center description max-sm:hidden">{{ \Illuminate\Support\Str::limit($todo['description'], 15, '...') ?? '--' }}</td>
+                                            <td class="px-4 py-3 text-center progress_rate max-sm:hidden">{{ $todo['progress_rate'] ?? '--' }}%</td>
+                                            <td class="px-4 py-3 text-center priority max-sm:hidden">{{ $todo['priority'] ?? '--' }}</td>
                                             <td class="px-4 py-3 text-center due">{{ $todo['due'] ?? '--' }}</td>
-                                            <td class="px-4 py-3 text-gray-500 text-sm hover:underline text-center"><a href="#" class="showBtn" todo-id="{{ $todo['id'] }}">詳細</a></td>
-                                            <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
+                                            <td class="px-4 py-3 text-gray-500 text-sm hover:underline text-center whitespace-nowrap"><a href="#" class="showBtn" todo-id="{{ $todo['id'] }}">詳細</a></td>
+                                            <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center max-sm:hidden">
                                                 <a href="#" class="todo_delete_btn" todo-id="{{ $todo['id'] }}">{{--ゴミ箱アイコン--}}
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5 text-gray-400">
                                                         <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />

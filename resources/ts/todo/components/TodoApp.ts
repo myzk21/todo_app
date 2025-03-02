@@ -3,7 +3,12 @@ import { Todo } from '../classes/Todo';
 // import { ok } from 'assert';
 // import { UpdateTodo } from '../classes/Todo';
 
-const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement).content;
+
+// let screenWidth = window.innerWidth;//画面幅を計測
+// window.addEventListener("resize", () => {
+//     screenWidth = window.innerWidth;
+// });
+// let width = screenWidth <= 640 ? "narrow" : "wide";
 
 export class TodoApp {
     private addButton: HTMLButtonElement;
@@ -13,7 +18,6 @@ export class TodoApp {
     private smallWidthTodoCreateForm: HTMLFormElement;
 
     private todoDetailModal = document.getElementById('todo_detail_modal') as HTMLElement;
-    private addToCalendarCheckbox = document.getElementById('addToCalendarCheckbox') as HTMLInputElement;
 
     constructor(
         addButtonId: string,
@@ -32,7 +36,7 @@ export class TodoApp {
             event.preventDefault();
             this.addTodo(this.addButton, this.todoCreateForm, "wide");
         });
-        this.openSmartPhoneAddModal.addEventListener('touchstart', (event) => {
+        this.openSmartPhoneAddModal.addEventListener('click', (event) => {
             event.preventDefault();
             this.displaySmartPhoneModal();
         });
@@ -48,7 +52,7 @@ export class TodoApp {
         closeModal.addEventListener('click', () => {
             smartPhoneCreateModal.classList.add('hidden');
         });
-        this.smallWidthAddButton.addEventListener('touchstart', (event) => {
+        this.smallWidthAddButton.addEventListener('click', (event) => {
             event.preventDefault();
             this.addTodo(this.smallWidthAddButton, this.smallWidthTodoCreateForm, "narrow");//TODOの追加
         });
@@ -104,14 +108,15 @@ export class TodoApp {
             }
         });
     }
+    private isProcessing = false;//処理中かどうかを判定
 
     // Todoの追加処理
     private async addTodo(addBtn: HTMLButtonElement, form: HTMLFormElement, displayWidth: string) {
+        if (this.isProcessing) return;//処理中なら処理を中止
+        this.isProcessing = true;
         addBtn.disabled = true;
-
         const formData = new FormData(form);
 
-        formData.append('_token', csrfToken);
         if (!formData) return;
         try {
             const newTodo: Todo = await TodoService.addTodo(formData, displayWidth);//サービスクラスを呼び出してTodoを追加
@@ -123,10 +128,6 @@ export class TodoApp {
             }
             this.renderTodo(newTodo);
             form.reset();//入力フィールドをクリア
-            addBtn.disabled = false;
-            if (this.addToCalendarCheckbox.checked) {
-                this.addToCalendarCheckbox.checked = false; // チェックを外す
-            }
             if (errorContainer) {
                 errorContainer.innerHTML = ''; //既存のエラーをクリア
             }
@@ -152,11 +153,15 @@ export class TodoApp {
                 <p class="text-white font-semibold">TODOの追加に失敗しました</p>
                 <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
             </div>`;
-            this.addButton.disabled = false;
             setTimeout(() => {
                 errorContainer.innerHTML = ''; // 3秒後に非表示
             }, 3000);
             console.error('Todoの追加に失敗しました');
+        } finally {
+            setTimeout(() => {
+                addBtn.disabled = false;
+                this.isProcessing = false; //ボタンを再起動
+            }, 1000);
         }
     }
 
@@ -198,15 +203,15 @@ export class TodoApp {
 
     // Todoの更新処理
     private async updateTodo(updateButton: HTMLButtonElement) {
+        if (this.isProcessing) return;//処理中なら処理を中止
+        this.isProcessing = true;
         updateButton.disabled = true;
         const todoUpdateForm = document.getElementById('todo_update_form') as HTMLFormElement;
         const updateFormData = new FormData(todoUpdateForm);
-        updateFormData.append('_token', csrfToken);
         if (!updateFormData) return;
         try {
             const updateTodo: Todo = await TodoService.updateTodo(updateFormData);//サービスクラスを呼び出してTodoを追加
             this.renderTodo(updateTodo);
-            updateButton.disabled = false;
             this.todoDetailModal.innerHTML = '';
             const userActionDialog = document.getElementById('user_action_dialog') as HTMLElement;
             userActionDialog.classList.remove('hidden');
@@ -226,11 +231,15 @@ export class TodoApp {
                 <p class="text-white font-semibold">TODOの更新に失敗しました</p>
                 <p class="text-right text-white absolute -top-1 right-2 cursor-pointer text-3xl" id="closeSystemError">×</p>
             </div>`;
-            updateButton.disabled = false;
             setTimeout(() => {
                 errorContainer.innerHTML = ''; // 3秒後に非表示
             }, 3000);
             console.error('Todoの更新に失敗しました');
+        } finally {
+            setTimeout(() => {
+                this.isProcessing = false;
+                updateButton.disabled = false;
+            }, 1000);
         }
     }
 
@@ -281,7 +290,7 @@ export class TodoApp {
         }
         const modalHTML = `
             <div class="w-full h-full z-50 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div class="px-6 pb-5 pt-3 shadow-sm w-3/5 rounded bg-white" id="">
+                <div class="px-6 pb-5 pt-3 shadow-sm w-3/5 rounded bg-white max-sm:h-screen max-sm:overflow-y-scroll" id="">
                     <div class="pointer-events-none flex justify-end">
                         <p class="text-4xl cursor-pointer hover:opacity-60 -mb-2 pointer-events-auto inline-block" id="close-show-todo">×</p>
                     </div>
@@ -292,10 +301,10 @@ export class TodoApp {
                         <input type="text" class="border border-gray-500 rounded h-8 mb-2 placeholder:text-sm placeholder:text-gray-300 w-full" placeholder="TODOを入力" name="updateTitle" value="${showTodo.title}" id="todo_title_input">
                         <label for="todo_description_input" class="block mb-1">内容</label>
                         <textarea placeholder="内容" class="mb-1 placeholder:text-sm placeholder:text-gray-300 rounded w-full" name="updateDescription" id="todo_description_input">${showTodo.description ?? ''}</textarea>
-                        <div class="flex flex-wrap pt-1">
+                        <div class="sm:flex sm:flex-wrap pt-1">
                             <div class="w-full sm:w-auto mb-4 sm:mb-0">
                                 <label for="percentage">進捗率</label>
-                                <select id="percentage" class="rounded mr-4" name="updateProgress_rate">
+                                <select id="percentage" class="rounded mr-4 max-sm:block max-sm:w-full" name="updateProgress_rate">
                                     <option value="">--</option>
                                     ${Array.from({ length: 11 }, (_, i) => {
                                         const value = i * 10; // 0, 10, 20, ..., 100
@@ -307,7 +316,7 @@ export class TodoApp {
                             </div>
                             <div class="w-full sm:w-auto mb-4 sm:mb-0">
                                 <label for="priority">優先度</label>
-                                <select id="priority" class="rounded mr-4" name="updatePriority">
+                                <select id="priority" class="rounded mr-4 max-sm:block max-sm:w-full" name="updatePriority">
                                     <option value="">--</option>
                                     <option value="高" ${showTodo.priority == '高' ? 'selected' : ''}>高</option>
                                     <option value="中" ${showTodo.priority == '中' ? 'selected' : ''}>中</option>
@@ -316,7 +325,7 @@ export class TodoApp {
                             </div>
                             <div class="w-full sm:w-auto mb-4 sm:mb-0">
                                 <label for="due">期日</label>
-                                <input type="date" name="updateDue" id="due" class="rounded" value="${showTodo.due ?? ""}">
+                                <input type="date" name="updateDue" id="due" class="rounded max-sm:block max-sm:w-full" value="${showTodo.due ?? ""}">
                             </div>
                             <input type="hidden" name="googleUser" value="${showTodo.user.google_user ? showTodo.user.google_user.id : ''}">
                             <input type="hidden" name="event_id" value="${showTodo.event_id ? showTodo.event_id : ''}">
@@ -330,9 +339,9 @@ export class TodoApp {
                                 <p class="ml-1 select-none ${authenticatedByGoogle ? '' : 'line-through'}">Googleカレンダーに追加</p>
                             </label>
                         </div>
-                        <div class="w-full flex mt-1">
-                            <button class="bg-[#8b8a8e] text-white text-sm px-4 py-2 rounded ml-auto hover:bg-opacity-80 select-none flex justify-end" id="todo_update_btn">保存</button>
-                            <p class="hover:underline cursor-pointer px-4 py-2 text-gray-400 text-sm todo_delete_btn" todo-id="${showTodo.id}"><a>削除</a></p>
+                        <div class="w-full sm:flex mt-1 max-sm:mt-3">
+                            <button class="bg-[#8b8a8e] text-white text-sm px-4 py-2 rounded ml-auto hover:bg-opacity-80 select-none sm:flex sm:justify-end max-sm:w-full max-sm:text-center" id="todo_update_btn">保存</button>
+                            <p class="hover:underline cursor-pointer px-4 py-2 text-gray-400 text-sm todo_delete_btn max-sm:w-full max-sm:text-center max-sm:bg-gray-100 max-sm:mt-2 max-sm:text-gray-600" todo-id="${showTodo.id}"><a>削除</a></p>
                         </div>
                     </form>
                 </div>
@@ -421,7 +430,7 @@ export class TodoApp {
         newRow.setAttribute('data-created-at', todo.created_at);
         newRow.innerHTML = `
             <td class="px-4 py-3 text-center">
-               <label class="inline-flex items-center">
+                <label class="inline-flex items-center">
                     <input type="checkbox" class="hidden peer todo-checkbox">
                     <div class="w-5 h-5 border border-gray-400 rounded-sm peer-checked:bg-gray-500 relative ${todo.is_completed ? 'bg-[#8b8a8e]' : ''}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 peer-checked:block w-4 h-4 text-white text-center absolute inset-0 m-auto">
@@ -431,14 +440,14 @@ export class TodoApp {
                 </label>
             </td>
             <td class="px-4 py-3 text-center title">${todo.title.slice(0, 7) + (todo.title.length > 7 ? '...' : '')}</td>
-            <td class="px-4 py-3 text-center description">${(todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--')}</td>
-            <td class="px-4 py-3 text-center progress_rate">${todo.progress_rate ?? '--'}%</td>
-            <td class="px-4 py-3 text-center priority">${todo.priority ?? '--'}</td>
+            <td class="px-4 py-3 text-center description max-sm:hidden">${(todo.description ? todo.description.slice(0, 7) + (todo.description.length > 7 ? '...' : '') : '--')}</td>
+            <td class="px-4 py-3 text-center progress_rate max-sm:hidden">${todo.progress_rate ?? '--'}%</td>
+            <td class="px-4 py-3 text-center priority max-sm:hidden">${todo.priority ?? '--'}</td>
             <td class="px-4 py-3 text-center due">${todo.due ?? '--'}</td>
             <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
-                <a href="#" class="showBtn" todo-id="${todo.id}">詳細</a>
+                <a href="#" class="showBtn whitespace-nowrap" todo-id="${todo.id}">詳細</a>
             </td>
-            <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
+            <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center max-sm:hidden">
                 <a href="#" class="todo_delete_btn" todo-id="${todo.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5 text-gray-400">
                         <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
