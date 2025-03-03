@@ -161,7 +161,7 @@
                     @include('todo.components.create_form'){{--詳細フォームを読み込み--}}
                 </form>
 
-                <p class="mx-auto my-4 px-6 w-full bg-green-700 text-white text-sm py-2 rounded hover:bg-opacity-80 select-none cursor-pointer hidden max-sm:flex justify-center" id="open_smartphone_add_modal">
+                <p class="mx-auto my-4 px-6 w-full bg-green-700 text-white text-sm py-2 rounded hover:bg-opacity-80 select-none cursor-pointer hidden max-sm:flex justify-center shadow" id="open_smartphone_add_modal">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 mr-1">
                         <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
                     </svg>
