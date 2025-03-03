@@ -46,7 +46,7 @@ export class TodoApp {
     }
 
     private displaySmartPhoneModal() {
-        let smartPhoneCreateModal = document.getElementById('small_width_todo_create_form') as HTMLElement;
+        let smartPhoneCreateModal = document.getElementById('small_width_todo_create_container') as HTMLElement;
         let closeModal = document.getElementById('close_smart_modal') as HTMLElement;
         smartPhoneCreateModal.classList.remove('hidden');
         closeModal.addEventListener('click', () => {
@@ -132,7 +132,7 @@ export class TodoApp {
                 errorContainer.innerHTML = ''; //既存のエラーをクリア
             }
             if (displayWidth == "narrow") {
-                let smartPhoneCreateModal = document.getElementById('small_width_todo_create_form') as HTMLElement;
+                let smartPhoneCreateModal = document.getElementById('small_width_todo_create_container') as HTMLElement;
                 smartPhoneCreateModal.classList.add('hidden');
             }
             const userActionDialog = document.getElementById('user_action_dialog') as HTMLElement;
@@ -290,7 +290,7 @@ export class TodoApp {
         }
         const modalHTML = `
             <div class="w-full h-full z-50 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div class="px-6 pb-5 pt-3 shadow-sm w-3/5 rounded bg-white max-sm:h-screen max-sm:overflow-y-scroll" id="">
+                <div class="px-6 pb-5 pt-3 shadow-sm w-3/5 rounded bg-white max-sm:w-4/5 max-sm:overflow-y-scroll max-sm:h-[calc(100%-32px)]" id="">
                     <div class="pointer-events-none flex justify-end">
                         <p class="text-4xl cursor-pointer hover:opacity-60 -mb-2 pointer-events-auto inline-block" id="close-show-todo">×</p>
                     </div>
@@ -341,7 +341,7 @@ export class TodoApp {
                         </div>
                         <div class="w-full sm:flex mt-1 max-sm:mt-3">
                             <button class="bg-[#8b8a8e] text-white text-sm px-4 py-2 rounded ml-auto hover:bg-opacity-80 select-none sm:flex sm:justify-end max-sm:w-full max-sm:text-center" id="todo_update_btn">保存</button>
-                            <p class="hover:underline cursor-pointer px-4 py-2 text-gray-400 text-sm todo_delete_btn max-sm:w-full max-sm:text-center max-sm:bg-gray-100 max-sm:mt-2 max-sm:text-gray-600" todo-id="${showTodo.id}"><a>削除</a></p>
+                            <p class="hover:underline cursor-pointer px-4 py-2 text-gray-400 text-sm todo_delete_btn max-sm:w-full max-sm:text-center max-sm:rounded max-sm:bg-red-500 max-sm:mt-2 max-sm:text-white" todo-id="${showTodo.id}"><a>削除</a></p>
                         </div>
                     </form>
                 </div>
