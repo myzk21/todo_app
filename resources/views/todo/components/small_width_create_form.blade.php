@@ -1,6 +1,9 @@
 <div class="w-full h-full z-50 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden" id="small_width_todo_create_container">
     <form action="" method="POST" class="shadow-sm mx-5 my-5 py-3 bg-white rounded-lg h-[calc(100%-32px)] w-4/5 overflow-y-auto" id="small_width_todo_create_form">
         @csrf
+        <div class="pointer-events-none flex justify-end">
+            <p class="text-4xl cursor-pointer hover:opacity-60 -mb-2 pointer-events-auto inline-block mr-5" id="close_smart_modal">×</p>
+        </div>
         <div id="smallWidthErrorContainer"></div> {{--バリデーションエラー表示--}}
         <div class="px-6">
             <label>TODO</label>
@@ -56,7 +59,6 @@
             @endif
 
             <button class="block mb-3 w-full bg-green-700 text-white text-sm px-4 py-2 rounded mx-auto hover:bg-opacity-80 select-none" id="small_width_todo_add_btn">追加</button>
-            <p class="bg-gray-200 rounded shadow-sm p-1 m-1 cursor-pointer hover:underline hover:opacity-80 mb-3 text-center" id="close_smart_modal">キャンセル</p>
         </div>
     </form>
 </div>
