@@ -5,14 +5,6 @@
 
     <section class="bg-gray-50 px-8 py-5 max-sm:px-4 max-sm:py-3">
         @if(session()->has('invalidRefreshToken'))
-            <script>
-                window.onload = function() {
-                    if (!localStorage.getItem('hasReloaded')) {
-                        localStorage.setItem('hasReloaded', 'true');
-                        location.reload(); //一度だけページをリロード
-                    }
-                };
-            </script>
             <p class="text-red-500 font-semibold mb-1 underline">Googleアカウントに接続してください</p>
         @endif
         @if ($errors->has('googleAuthError'))
