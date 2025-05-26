@@ -139,10 +139,18 @@ class TodoController extends Controller
             ]);
         } catch(\Exception $error) {
             DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'エラーが発生しました: ' . $error->getMessage(),
-            ], 500);
+            if (session()->get('invalidRefreshToken')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'エラーが発生しました: ' . $error->getMessage(),
+                    'invalidRefreshToken' => 'リフレッシュトークンエラー'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'エラーが発生しました: ' . $error->getMessage(),
+                ], 500);
+            }
         }
     }
 

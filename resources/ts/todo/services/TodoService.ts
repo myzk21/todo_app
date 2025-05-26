@@ -28,7 +28,7 @@ export class TodoService {
             if (!token) {
                 throw new Error('CSRFトークンが見つかりません。');
             }
-            const response: AxiosResponse<{ success: boolean, message: string, todo: Todo }> = await axios.post(
+            const response: AxiosResponse<{ success: boolean, message: string, todo: Todo, invalidRefreshToken: string|null }> = await axios.post(
                 '/add_todo',
                 formData,
             {
@@ -36,14 +36,17 @@ export class TodoService {
                     'X-CSRF-TOKEN': token,
                 },
             });
+            if (!response.data.success) {
+                throw new Error(response.data.invalidRefreshToken ?? response.data.message);
+            }
             return response.data.todo;
-        } catch (error) {
+        } catch (error: any) {
             if (axios.isAxiosError(error) && error.response) {
                 // バリデーションエラーの処理
                 const validationErrors = error.response.data.errors;
                 displayCreateValidationErrors(validationErrors, displayWidth);
             } else {
-                console.error('リクエスト中にエラーが発生しました', error);
+                throw new Error(error.message);
             }
             throw new Error('Todoの追加に失敗しました');
         }

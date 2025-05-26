@@ -35,6 +35,7 @@ class OAuthController extends Controller
             }
 
             //アクセストークンとリフレッシュトークンを保存
+            // $google_user->access_token = encrypt($social_user->token);
             $google_user->access_token = $social_user->token;
             if (!empty($social_user->refreshToken)) {
                 $google_user->refresh_token = $social_user->refreshToken;

@@ -142,7 +142,11 @@ export class TodoApp {
                 userActionDialog.classList.add('hidden'); // 3秒後に非表示
             }, 3000);
             console.log('Todoの追加に成功しました');
-        } catch (error) {
+        } catch (error: any) {
+            if (error.message == 'リフレッシュトークンエラー') {
+                alert('セッションが無効になりました。Googleアカウントに再接続してください。');
+                location.reload();
+            }
             const errorContainer = document.getElementById('systemErrorContainer') as HTMLElement;
             errorContainer.innerHTML = '';
             errorContainer.innerHTML = `

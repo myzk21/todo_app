@@ -17,18 +17,36 @@ class CalendarService
         $this->client = $client;
     }
 
+    public function setGoogleAccessToken($googleUser) {
+        //isAccessTokenExpired()が標準時基準でチェックされるため、UTCの時間で保存
+        $expires_in = \Carbon\Carbon::parse($googleUser->expires)->setTimezone('UTC')->timestamp - now('UTC')->timestamp;//Googleユーザ―のアクセストークンの有効期限から今の時間を引くー＞後何秒か求める。これがupdated_atと足されてisAccessTokenExpiredが見極められる
+        $this->client->setAccessToken([
+            'access_token' => $googleUser->access_token,
+            'expires_in' => $expires_in,
+            'created' => $googleUser->updated_at->setTimezone('UTC')->timestamp,
+            'refresh_token' => $googleUser->refresh_token,
+        ]);
+    }
+
     public function addEvent($googleUser, $eventDetails)
     {
+        $this->setGoogleAccessToken($googleUser);
+
         //トークンの期限切れをチェックし、必要に応じてリフレッシュ
-        $this->client->setAccessToken($googleUser->access_token);
         if ($this->client->isAccessTokenExpired()) {
             $newAccessToken = $this->client->fetchAccessTokenWithRefreshToken($googleUser->refresh_token);
-            if (isset($newAccessToken['error'])) {//エラーが発生した場合、再認証してもらう
+            if (isset($newAccessToken['error'])) {
                 \Log::error('リフレッシュトークンエラー:', $newAccessToken);
                 session()->put('invalidRefreshToken', true);
+                throw new \Exception('Google認証に失敗しました。Googleアカウントに再接続してください。');
             }
-            $googleUser->access_token = $this->client->getAccessToken()['access_token'];
+            $googleUser->access_token = $newAccessToken['access_token'];
+            $expiresIn = $newAccessToken['expires_in'] ?? 3600;
+            $googleUser->expires = now()->addSeconds($expiresIn);
             $googleUser->save(); //新しいトークンを保存
+            $googleUser->refresh();
+
+            $this->setGoogleAccessToken($googleUser);//$this->clientに最新の情報をセットするための処理
         }
 
         $service = new Google_Service_Calendar($this->client);
@@ -51,16 +69,23 @@ class CalendarService
 
     public function updateEvent($googleUser, $eventId, $eventDetails)
     {
-        $this->client->setAccessToken($googleUser->access_token);
+        $this->setGoogleAccessToken($googleUser);
+
         // トークンの期限切れをチェックし、必要に応じてリフレッシュ
         if ($this->client->isAccessTokenExpired()) {
             $newAccessToken = $this->client->fetchAccessTokenWithRefreshToken($googleUser->refresh_token);
             if (isset($newAccessToken['error'])) {//エラーが発生した場合、再認証してもらう
                 \Log::error('リフレッシュトークンエラー:', $newAccessToken);
                 session()->put('invalidRefreshToken', true);
+                throw new \Exception('Google認証に失敗しました。Googleアカウントに再接続してください。');
             }
-            $googleUser->access_token = $this->client->getAccessToken()['access_token'];
-            $googleUser->save(); // 新しいトークンを保存
+            $googleUser->access_token = $newAccessToken['access_token'];
+            $expiresIn = $newAccessToken['expires_in'] ?? 3600;
+            $googleUser->expires = now()->addSeconds($expiresIn);
+            $googleUser->save(); //新しいトークンを保存
+            $googleUser->refresh();
+
+            $this->setGoogleAccessToken($googleUser);
         }
 
         $service = new Google_Service_Calendar($this->client);
@@ -86,16 +111,23 @@ class CalendarService
 
     public function deleteEvent($googleUser, $eventId)
     {
-        $this->client->setAccessToken($googleUser->access_token);
+        $this->setGoogleAccessToken($googleUser);
+
         // トークンの期限切れをチェックし、必要に応じてリフレッシュ
         if ($this->client->isAccessTokenExpired()) {
             $newAccessToken = $this->client->fetchAccessTokenWithRefreshToken($googleUser->refresh_token);
             if (isset($newAccessToken['error'])) {//エラーが発生した場合、再認証してもらう
                 \Log::error('リフレッシュトークンエラー:', $newAccessToken);
                 session()->put('invalidRefreshToken', true);
+                throw new \Exception('Google認証に失敗しました。Googleアカウントに再接続してください。');
             }
-            $googleUser->access_token = $this->client->getAccessToken()['access_token'];
-            $googleUser->save(); // 新しいトークンを保存
+            $googleUser->access_token = $newAccessToken['access_token'];
+            $expiresIn = $newAccessToken['expires_in'] ?? 3600;
+            $googleUser->expires = now()->addSeconds($expiresIn);
+            $googleUser->save(); //新しいトークンを保存
+            $googleUser->refresh();
+
+            $this->setGoogleAccessToken($googleUser);
         }
         $service = new Google_Service_Calendar($this->client);
         $deleteEvent = $service->events->delete('primary', $eventId);
