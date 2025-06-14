@@ -127,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
     //タイマー表示
     const TimerStatus = ['start', 'stop', 'finish'];
     const timerContainer = document.getElementById('timer_container') as HTMLElement;
-    const startBtn = document.querySelectorAll('.start_btn') as NodeListOf<HTMLElement>;
     const stopBtn = document.getElementById('stop_btn') as HTMLElement;
     const timerNumber = document.getElementById('timer_number') as HTMLElement;
     const todoTitleContainer = document.getElementById('todo_title') as HTMLElement;
@@ -151,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchTimerData() {
         let response = await TodoTimer.fetchTimerData();
         let data = response.data;
+        const startBtn = document.querySelectorAll('.start_btn') as NodeListOf<HTMLElement>;
         if (!data) {
             return;
         }
@@ -201,12 +201,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleStartTimer() {
-        startBtn.forEach((btn) => {
-            btn.addEventListener('click', async () => {
+        incompleteTaskContainer.addEventListener('click', async (event) => {
+            const target = event.target as HTMLElement;
+            if (target.classList.contains('start_btn')) {///NOTE:非同期で追加された要素にもクリックした処理が行われるように、親要素にクリックイベントを設定して正確なデータを取得できるようにする
+                const startBtn = document.querySelectorAll('.start_btn') as NodeListOf<HTMLElement>;
+                ///スタートボタンは各タスクに設置されるため、非同期で追加された場合に、それも含む全てのボタンを取得するためにこのタイミングで取得
                 if (!timerContainer.classList.contains('hidden')) {
                     return;//タイマー表示状態ならクリックできない
                 }
-                let todoId = btn.dataset.todoId as string;
+                let todoId = target.dataset.todoId as string;
+                if(!todoId) {
+                    alert('タイマーの記録に失敗しました');
+                    location.reload();
+                    return;
+                }
                 let status = TimerStatus[0];
                 let response = await TodoTimer.storeTimerData(todoId, status);
                 if (!response.success) {
@@ -214,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     location.reload();
                     return;
                 } else {
-                    const todoTitle = btn.dataset.todoTitle as string;
+                    const todoTitle = target.dataset.todoTitle as string;
                     todoTitleContainer.textContent = todoTitle;
                     timerContainer.classList.remove('hidden');
                     timerContainer.dataset.todoId = todoId;
@@ -232,7 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         b.classList.add('text-gray-300');
                     });
                 }
-            });
+            }
+
         });
     }
 
@@ -273,6 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             timerNumber.textContent = "";
             todoTitleContainer.textContent = "";
 
+            const startBtn = document.querySelectorAll('.start_btn') as NodeListOf<HTMLElement>;
             startBtn.forEach((btn) => {
                 btn.classList.add('text-green-500');
                 btn.classList.remove('text-gray-300');

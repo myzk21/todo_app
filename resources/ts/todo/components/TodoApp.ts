@@ -464,6 +464,7 @@ export class TodoApp {
             <td class="px-4 py-3 text-center progress_rate max-sm:hidden">${todo.progress_rate ?? '--'}%</td>
             <td class="px-4 py-3 text-center priority max-sm:hidden">${todo.priority ?? '--'}</td>
             <td class="px-4 py-3 text-center due">${todo.due ?? '--'}</td>
+            <td class="${todo.is_completed ? "hidden" : ""} px-4 py-3 text-green-500 text-lg text-center hover:cursor-pointer whitespace-nowrap max-sm:hidden start_btn" data-todo-title="${todo.title}" data-todo-id="${todo.id}" >START</td>
             <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
                 <a href="#" class="showBtn whitespace-nowrap" todo-id="${todo.id}">詳細</a>
             </td>
