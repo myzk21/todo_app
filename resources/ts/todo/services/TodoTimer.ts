@@ -15,6 +15,19 @@ export class TodoTimer {
             return error;
         }
     }
+
+    static async fetchTimerData() {
+        try {
+            let token = await fetchToken();
+            if (!token) {
+                throw new Error('CSRFトークンが見つかりません。');
+            }
+            const response = await axios.patch('/fetch_timer_data', {}, {headers: {'X-CSRF-TOKEN': token,}});
+            return response.data;
+        } catch (error) {
+            return error;
+        }
+    }
 }
 
 async function fetchToken() {

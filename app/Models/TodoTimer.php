@@ -13,4 +13,8 @@ class TodoTimer extends Model
         'user_id',
         'todo_id',
     ];
+
+    public function todo() {
+        return $this->belongsTo(Todo::class, 'todo_id', 'id');
+    }
 }

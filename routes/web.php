@@ -59,6 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/auth/google/callback', [OAuthController::class, 'authenticateWithGoogle']);
     //タイマーの記録
     Route::post('/store_timer_data', [TimerController::class, 'storeTimerData']);
+    Route::patch('/fetch_timer_data', [TimerController::class, 'fetchTimerData']);
 });
 
 require __DIR__.'/auth.php';

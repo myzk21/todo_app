@@ -142,10 +142,63 @@ document.addEventListener('DOMContentLoaded', () => {
         message?: string;
     }
 
+    fetchTimerData();//アクセス時に起動しているタイマーがないかチェック
     handleStartTimer();
     handleStopTimer();
     handleFinishTimer();
     handleRestartTimer();
+
+    async function fetchTimerData() {
+        let response = await TodoTimer.fetchTimerData();
+        let data = response.data;
+        if (!data) {
+            return;
+        }
+        if (data.status == TimerStatus[0]) {
+            //継続してタイマーを作動させる処理
+            todoTitleContainer.textContent = data.todo.title;
+            timerContainer.classList.remove('hidden');
+            timerContainer.dataset.todoId = data.todo.id;
+            seconds = calculateTimer(data);//開始時刻から何秒経過しているかを算出
+            if (seconds != 0) {
+                timerNumber.textContent = formatTime(seconds);
+            }
+            time = window.setInterval(() => {
+                seconds++;
+                timerNumber.textContent = formatTime(seconds);
+            }, 1000);
+
+            startBtn.forEach((b) => {
+                b.classList.remove('text-green-500');
+                b.classList.add('text-gray-300');
+            });
+
+        } else if(data.status == TimerStatus[1]) {
+            //停止した状態のタイマーを表示
+            restartBtn.classList.remove('hidden');
+            finishBtn.classList.remove('hidden');
+            stopBtn.classList.add('hidden');
+            todoTitleContainer.textContent = data.todo.title;
+            timerContainer.classList.remove('hidden');
+            timerContainer.dataset.todoId = data.todo.id;
+            seconds = data.elapsed_time_at_stop;
+            timerNumber.textContent = formatTime(seconds);
+            startBtn.forEach((b) => {
+                b.classList.remove('text-green-500');
+                b.classList.add('text-gray-300');
+            });
+        }
+    }
+
+    function calculateTimer(data: any): number {
+        const startTime = new Date(data.started_at);
+        const now = new Date();
+        const startTimestamp = Math.floor(startTime.getTime() / 1000);
+        const nowTimestamp = Math.floor(now.getTime() / 1000);
+        let time = nowTimestamp - startTimestamp;
+        let elapsedTime = data.elapsed_time_at_stop + time;
+        return elapsedTime;
+    }
 
     function handleStartTimer() {
         startBtn.forEach((btn) => {

@@ -105,4 +105,33 @@ class TimerController extends Controller
         }
         return $timer;
     }
+
+    public function fetchTimerData()
+    {
+        $user_id = Auth::id();
+        $timer = TodoTimer::with('todo')->where('user_id', $user_id)->where('status', '!=', 'finish')->first();
+        if (!$timer) {
+            return response()->json([
+                'success' => true,
+                'message' => 'データを取得しました',
+                'data' => null,
+            ]);
+        }
+        if ($timer->elapsed_time_at_stop >= 356400) {//99時間以上なら自動でフィニッシュにする
+            $timer->update([
+                'status' => TodoTimerStatus::Finish->value,
+            ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'データを取得しました',
+                'data' => null,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'データを取得しました',
+            'data' => $timer,
+        ]);
+    }
 }
