@@ -167,7 +167,7 @@
                         <p class="text-white text-lg" id="todo_title"></p>
                         <p class="text-red-500 text-lg hover:cursor-pointer" id="stop_btn">STOP</p>
                         <p class="text-green-500 text-lg hover:cursor-pointer hidden" id="restart_btn">RESTART</p>
-                        <p class="text-red-500 text-lg hover:cursor-pointer underline hidden" id="finish_btn">FINISH</p>
+                        <p class="text-red-500 text-lg hover:cursor-pointer hidden" id="finish_btn">FINISH</p>
                     </div>
                 </div>
 

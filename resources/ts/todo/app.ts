@@ -131,70 +131,88 @@ document.addEventListener('DOMContentLoaded', () => {
     const stopBtn = document.getElementById('stop_btn') as HTMLElement;
     const timerNumber = document.getElementById('timer_number') as HTMLElement;
     const todoTitleContainer = document.getElementById('todo_title') as HTMLElement;
+    const restartBtn = document.getElementById('restart_btn') as HTMLElement;
+    const finishBtn = document.getElementById('finish_btn') as HTMLElement;
     let seconds: number = 0;
     let time: number | undefined;
 
-    ///スタートボタン押したときの処理
-    startBtn.forEach((btn) => {
-        btn.addEventListener('click', async () => {
-            if (!timerContainer.classList.contains('hidden')) {
-                return;//タイマー表示状態ならクリックできない
-            }
-            let todoId = btn.dataset.todoId as string;
-            let status = TimerStatus[0];
-            let response = await TodoTimer.storeTimerData(todoId, status);
-            if (!response.success) {
-                alert('タイマーの記録に失敗しました');
-                location.reload();
-                return;
-            } else {
-                const todoTitle = btn.dataset.todoTitle as string;
-                timerContainer.dataset.todoId = todoId;
-                todoTitleContainer.textContent = todoTitle;
-                timerContainer.classList.remove('hidden');
-                seconds = response.data.elapsed_time_at_stop;
-                time = window.setInterval(() => {
-                    seconds++;
-                    timerNumber.textContent = formatTime(seconds);
-                }, 1000);
+    interface TimerResponse {
+        success: boolean;
+        data?: any;
+        message?: string;
+    }
 
-                startBtn.forEach((b) => {
-                    b.classList.remove('text-green-500');
-                    b.classList.add('text-gray-300');
-                });
+    handleStartTimer();
+    handleStopTimer();
+    handleFinishTimer();
+    handleRestartTimer();
+
+    function handleStartTimer() {
+        startBtn.forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                if (!timerContainer.classList.contains('hidden')) {
+                    return;//タイマー表示状態ならクリックできない
+                }
+                let todoId = btn.dataset.todoId as string;
+                let status = TimerStatus[0];
+                let response = await TodoTimer.storeTimerData(todoId, status);
+                if (!response.success) {
+                    alert('タイマーの記録に失敗しました');
+                    location.reload();
+                    return;
+                } else {
+                    const todoTitle = btn.dataset.todoTitle as string;
+                    todoTitleContainer.textContent = todoTitle;
+                    timerContainer.classList.remove('hidden');
+                    timerContainer.dataset.todoId = todoId;
+                    seconds = response.data.elapsed_time_at_stop;
+                    if (seconds != 0) {//すでに記録があるタイマーをスタートさせたとき
+                        timerNumber.textContent = formatTime(seconds);
+                    }
+                    time = window.setInterval(() => {
+                        seconds++;
+                        timerNumber.textContent = formatTime(seconds);
+                    }, 1000);
+
+                    startBtn.forEach((b) => {
+                        b.classList.remove('text-green-500');
+                        b.classList.add('text-gray-300');
+                    });
+                }
+            });
+        });
+    }
+
+    function handleStopTimer() {
+        stopBtn.addEventListener('click', async () => {
+            restartBtn.classList.remove('hidden');
+            finishBtn.classList.remove('hidden');
+            stopBtn.classList.add('hidden');
+            let todoId = timerContainer.dataset.todoId as string;
+            if (time != undefined) {
+                clearInterval(time);//タイマーストップ
+                //経過時間を記録
+                let status = TimerStatus[1];
+                let response = await TodoTimer.storeTimerData(todoId, status);
+                if(!response.success) {
+                    alert('タイマーの記録に失敗しました');
+                    location.reload();
+                    return;
+                }
             }
         });
-    });
+    }
 
-    ///タイマー停止したときの処理
-    stopBtn.addEventListener('click', async () => {
-        const restartBtn = document.getElementById('restart_btn') as HTMLElement;
-        const finishBtn = document.getElementById('finish_btn') as HTMLElement;
-        restartBtn.classList.remove('hidden');
-        finishBtn.classList.remove('hidden');
-        stopBtn.classList.add('hidden');
-        let todoId = timerContainer.dataset.todoId as string;
-        if (time != undefined) {
-            clearInterval(time);//タイマーストップ
-            //経過時間を記録
-            let status = TimerStatus[1];
+    function handleFinishTimer() {
+        finishBtn.addEventListener('click', async () => {
+            let todoId = timerContainer.dataset.todoId as string;
+            let status = TimerStatus[2];
             let response = await TodoTimer.storeTimerData(todoId, status);
             if(!response.success) {
                 alert('タイマーの記録に失敗しました');
                 location.reload();
                 return;
             }
-        }
-
-        //リスタートの処理
-        restartBtn.addEventListener('click', () => {
-            restartBtn.classList.add('hidden');
-            finishBtn.classList.add('hidden');
-            stopBtn.classList.remove('hidden');
-        });
-
-        //フィニッシュボタン
-        finishBtn.addEventListener('click', () => {
             timerContainer.classList.add('hidden');
             restartBtn.classList.add('hidden');
             finishBtn.classList.add('hidden');
@@ -207,8 +225,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.classList.remove('text-gray-300');
             });
         });
+    }
 
-    });
+    function handleRestartTimer() {
+        restartBtn.addEventListener('click', async () => {
+            let todoId = timerContainer.dataset.todoId as string;
+            restartBtn.classList.add('hidden');
+            finishBtn.classList.add('hidden');
+            stopBtn.classList.remove('hidden');
+
+            let status = TimerStatus[0];
+            let response = await TodoTimer.storeTimerData(todoId, status);
+            if (!response.success) {
+                alert('タイマーの記録に失敗しました');
+                location.reload();
+                return;
+            }
+            seconds = response.data.elapsed_time_at_stop;
+            if (seconds != 0) {
+                timerNumber.textContent = formatTime(seconds);
+            }
+            time = window.setInterval(() => {
+                seconds++;
+                timerNumber.textContent = formatTime(seconds);
+            }, 1000);
+        });
+    }
 
     function formatTime(sec: number) {
         let hours = 0;
