@@ -226,7 +226,7 @@
                                     <th class="px-4 py-3 text-gray-700 font-medium text-center select-none max-sm:hidden">進捗率</th>
                                     <th class="px-4 py-3 text-gray-700 font-medium text-center select-none max-sm:hidden">優先度</th>
                                     <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">期日</th>
-                                    <th class="px-4 py-3 text-gray-700 font-medium"></th>
+                                    <th class="px-4 py-3 text-gray-700 font-medium max-sm:hidden"></th>
                                     <th class="px-4 py-3 text-gray-700 font-medium"></th>
                                     <th class="px-4 py-3 text-gray-700 font-medium max-sm:hidden"></th>
                                 </tr>
