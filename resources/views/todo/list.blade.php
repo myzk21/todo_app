@@ -160,6 +160,17 @@
                     TODOを作成
                 </p>{{--スマホ画面用ボタン--}}
 
+                {{--タイマー表示--}}
+                <div class="w-full bg-black rounded px-6 hidden" id="timer_container" data-todo-id="">
+                    <p class="text-white text-lg font-bold text-center" id="timer_number">00:00:00</p>
+                    <div class="flex justify-center gap-7 font-bold">
+                        <p class="text-white text-lg" id="todo_title"></p>
+                        <p class="text-red-500 text-lg hover:cursor-pointer" id="stop_btn">STOP</p>
+                        <p class="text-green-500 text-lg hover:cursor-pointer hidden" id="restart_btn">RESTART</p>
+                        <p class="text-red-500 text-lg hover:cursor-pointer underline hidden" id="finish_btn">FINISH</p>
+                    </div>
+                </div>
+
                 <div class="bg-white shadow-sm rounded-lg w-full overflow-x-auto max-sm:py-3">
                     <!--検索フォーム（スマホ用）-->
                     <div class="ml-2 mt-2 rounded bg-white flex hidden max-sm:block">
@@ -216,6 +227,7 @@
                                     <th class="px-4 py-3 text-gray-700 font-medium text-center select-none max-sm:hidden">優先度</th>
                                     <th class="px-4 py-3 text-gray-700 font-medium text-center select-none">期日</th>
                                     <th class="px-4 py-3 text-gray-700 font-medium"></th>
+                                    <th class="px-4 py-3 text-gray-700 font-medium"></th>
                                     <th class="px-4 py-3 text-gray-700 font-medium max-sm:hidden"></th>
                                 </tr>
                             </thead>
@@ -239,6 +251,7 @@
                                             <td class="px-4 py-3 text-center progress_rate max-sm:hidden">{{ $todo['progress_rate'] ?? '--' }}%</td>
                                             <td class="px-4 py-3 text-center priority max-sm:hidden">{{ $todo['priority'] ?? '--' }}</td>
                                             <td class="px-4 py-3 text-center due">{{ $todo['due'] ?? '--' }}</td>
+                                            <td class="px-4 py-3 text-green-500 text-lg text-center hover:cursor-pointer whitespace-nowrap max-sm:hidden start_btn" data-todo-title="{{ $todo['title'] }}" data-todo-id="{{ $todo['id'] }}" >START</td>
                                             <td class="px-4 py-3 text-gray-500 text-sm hover:underline text-center whitespace-nowrap"><a href="#" class="showBtn" todo-id="{{ $todo['id'] }}">詳細</a></td>
                                             <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center max-sm:hidden">
                                                 <a href="#" class="todo_delete_btn" todo-id="{{ $todo['id'] }}">{{--ゴミ箱アイコン--}}
@@ -258,6 +271,7 @@
                         </table>
                         {{ $incompleteTodos->links('vendor.pagination.tailwind') }}
                     </div>
+{{----------------------------以下完了タスク---------------------------------------------------}}
                     <div class="hidden" id="completeTaskContainer">
                         <table class="w-full text-left table-auto" id="completeTaskTable">
                             <thead>

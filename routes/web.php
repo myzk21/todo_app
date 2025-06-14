@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Todo\TodoController;
+use App\Http\Controllers\Todo\TimerController;
 use App\Http\Controllers\Pdca\PdcaController;
 use App\Http\Controllers\Pdca\CheckActionController;
 use App\Http\Controllers\Pdca\GoalController;
@@ -56,6 +57,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/auth/google/redirect', [OAuthController::class, 'redirectToGoogle'])->name('google.redirect');
     // oauthで飛んできたコードを使ってユーザを認証している
     Route::get('/auth/google/callback', [OAuthController::class, 'authenticateWithGoogle']);
+    //タイマーの記録
+    Route::post('/store_timer_data', [TimerController::class, 'storeTimerData']);
 });
 
 require __DIR__.'/auth.php';

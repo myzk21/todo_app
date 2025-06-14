@@ -1,4 +1,5 @@
 import { TodoApp } from './components/TodoApp';
+import { TodoTimer } from './services/TodoTimer';///NOTE:UIでの操作はここで行い、DBなどロジックの処理はTodoTimerというクラスを作成し、そこで操作することにするー＞コードが読みやすくなる
 
 //ページが読み込まれた時にTodoAppを初期化
 document.addEventListener('DOMContentLoaded', () => {
@@ -122,4 +123,103 @@ document.addEventListener('DOMContentLoaded', () => {
         incompleteTab.classList.remove('active');
         incompleteTab.classList.add('text-gray-500', 'hover:opacity-60');
     }
+
+    //タイマー表示
+    const TimerStatus = ['start', 'stop', 'finish'];
+    const timerContainer = document.getElementById('timer_container') as HTMLElement;
+    const startBtn = document.querySelectorAll('.start_btn') as NodeListOf<HTMLElement>;
+    const stopBtn = document.getElementById('stop_btn') as HTMLElement;
+    const timerNumber = document.getElementById('timer_number') as HTMLElement;
+    const todoTitleContainer = document.getElementById('todo_title') as HTMLElement;
+    let seconds: number = 0;
+    let time: number | undefined;
+
+    ///スタートボタン押したときの処理
+    startBtn.forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            if (!timerContainer.classList.contains('hidden')) {
+                return;//タイマー表示状態ならクリックできない
+            }
+            let todoId = btn.dataset.todoId as string;
+            let status = TimerStatus[0];
+            let response = await TodoTimer.storeTimerData(todoId, status);
+            if (!response.success) {
+                alert('タイマーの記録に失敗しました');
+                location.reload();
+                return;
+            } else {
+                const todoTitle = btn.dataset.todoTitle as string;
+                timerContainer.dataset.todoId = todoId;
+                todoTitleContainer.textContent = todoTitle;
+                timerContainer.classList.remove('hidden');
+                seconds = response.data.elapsed_time_at_stop;
+                time = window.setInterval(() => {
+                    seconds++;
+                    timerNumber.textContent = formatTime(seconds);
+                }, 1000);
+
+                startBtn.forEach((b) => {
+                    b.classList.remove('text-green-500');
+                    b.classList.add('text-gray-300');
+                });
+            }
+        });
+    });
+
+    ///タイマー停止したときの処理
+    stopBtn.addEventListener('click', async () => {
+        const restartBtn = document.getElementById('restart_btn') as HTMLElement;
+        const finishBtn = document.getElementById('finish_btn') as HTMLElement;
+        restartBtn.classList.remove('hidden');
+        finishBtn.classList.remove('hidden');
+        stopBtn.classList.add('hidden');
+        let todoId = timerContainer.dataset.todoId as string;
+        if (time != undefined) {
+            clearInterval(time);//タイマーストップ
+            //経過時間を記録
+            let status = TimerStatus[1];
+            let response = await TodoTimer.storeTimerData(todoId, status);
+            if(!response.success) {
+                alert('タイマーの記録に失敗しました');
+                location.reload();
+                return;
+            }
+        }
+
+        //リスタートの処理
+        restartBtn.addEventListener('click', () => {
+            restartBtn.classList.add('hidden');
+            finishBtn.classList.add('hidden');
+            stopBtn.classList.remove('hidden');
+        });
+
+        //フィニッシュボタン
+        finishBtn.addEventListener('click', () => {
+            timerContainer.classList.add('hidden');
+            restartBtn.classList.add('hidden');
+            finishBtn.classList.add('hidden');
+            stopBtn.classList.remove('hidden');
+            timerNumber.textContent = "";
+            todoTitleContainer.textContent = "";
+
+            startBtn.forEach((btn) => {
+                btn.classList.add('text-green-500');
+                btn.classList.remove('text-gray-300');
+            });
+        });
+
+    });
+
+    function formatTime(sec: number) {
+        let hours = 0;
+        let minutes = 0;
+        let seconds = 0;
+
+        hours = Math.floor(sec / 3600);//Math.floorで整数部分のみ求める、一時間もたってなければ0になるからOK
+        minutes = Math.floor((sec % 3600) / 60);
+        seconds = (sec % 3600) % 60;
+
+        return `${String(hours).padStart(2, "0")} : ${String(minutes).padStart(2, "0")} : ${String(seconds).padStart(2, "0")}`;
+    }
+
 });
