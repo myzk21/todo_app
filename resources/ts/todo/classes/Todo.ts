@@ -34,6 +34,7 @@ export class Todo {
         public deleted_at: Date | null,
         public event_id: string | null,
         public created_at: string,
+        public todo_timer: any,
         google_user: GoogleUser | null,
         user: User,
     ) {

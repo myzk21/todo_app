@@ -25,4 +25,9 @@ class Todo extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function todoTimer()
+    {
+        return $this->hasOne(TodoTimer::class, 'todo_id', 'id');
+    }
 }

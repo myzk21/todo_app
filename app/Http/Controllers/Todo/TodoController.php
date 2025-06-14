@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use App\Models\WeeklyGoal;
 use App\Models\MonthlyGoal;
 use App\Models\GoogleUser;
+use App\Models\TodoTimer;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Services\CalendarService;
 use  App\Http\Controllers\Auth\OAuthController;
@@ -160,7 +161,7 @@ class TodoController extends Controller
     public function show(string $id)
     {
         $user_id = Auth::id();
-        $todo = Todo::with('user.googleUser')
+        $todo = Todo::with('user.googleUser', 'todoTimer')
             ->where('user_id', $user_id)
             ->where('id', $id)
             ->first();

@@ -300,6 +300,7 @@ export class TodoApp {
                     </div>
                     <div id="updateErrorContainer"></div>
                     <form id="todo_update_form">
+                        <div class="hidden flex" id="displayTimerContainer"></div>
                         <input type="hidden" name="id" value="${showTodo.id}">
                         <label for="todo_title_input" class="block pb-1">タイトル</label>
                         <input type="text" class="border border-gray-500 rounded h-8 mb-2 placeholder:text-sm placeholder:text-gray-300 w-full" placeholder="TODOを入力" name="updateTitle" value="${showTodo.title}" id="todo_title_input">
@@ -357,7 +358,14 @@ export class TodoApp {
         closeButton.addEventListener('click', () => { //バツボタンがクリックされたときにモーダルを閉じる
             this.todoDetailModal.innerHTML = '';
         });
-
+        let displayTimerContainer = this.todoDetailModal.querySelector('#displayTimerContainer') as HTMLElement;
+        let timerStatus = showTodo.todo_timer?.status;
+        let elapsedTIme = showTodo.todo_timer?.elapsed_time_at_stop;
+        if (showTodo.todo_timer) {
+            displayTimerContainer.classList.remove('hidden');
+            displayTimerContainer.innerHTML = `
+            <p class="max-sm:block max-sm:w-full pb-2">経過時間: ${timerStatus == 'start' ? "計測中" : this.formatTimeData(elapsedTIme) }</p>`;
+        }
         const updateButton = document.getElementById('todo_update_btn') as HTMLButtonElement;
         updateButton.addEventListener('click', (event: MouseEvent) => {
             event.preventDefault();
@@ -399,6 +407,14 @@ export class TodoApp {
                 console.error('Todoの削除に失敗しました');
             }
         });
+    }
+
+    private formatTimeData(elapsedTIme: number) {
+        let hours = Math.floor(elapsedTIme / 3600);
+        let minutes = Math.floor((elapsedTIme % 3600) / 60);
+        let seconds = (elapsedTIme % 3600) % 60;
+
+        return `${hours}時間${minutes}分${seconds}秒`;
     }
 
     private updateTodoItem(existingTodoItem: HTMLTableRowElement | HTMLDivElement, todo: Todo) {
@@ -448,6 +464,7 @@ export class TodoApp {
             <td class="px-4 py-3 text-center progress_rate max-sm:hidden">${todo.progress_rate ?? '--'}%</td>
             <td class="px-4 py-3 text-center priority max-sm:hidden">${todo.priority ?? '--'}</td>
             <td class="px-4 py-3 text-center due">${todo.due ?? '--'}</td>
+            <td class="${todo.is_completed ? "hidden" : ""} px-4 py-3 text-green-500 text-lg text-center hover:cursor-pointer whitespace-nowrap max-sm:hidden start_btn" data-todo-title="${todo.title}" data-todo-id="${todo.id}" >START</td>
             <td class="px-4 py-3 text-gray-400 text-sm hover:underline text-center">
                 <a href="#" class="showBtn whitespace-nowrap" todo-id="${todo.id}">詳細</a>
             </td>

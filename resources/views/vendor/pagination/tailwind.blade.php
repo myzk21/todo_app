@@ -60,29 +60,38 @@
                     @endif
 
                     {{-- Pagination Elements --}}
+                    @php
+                        $maxNum = $paginator->currentPage();
+                    @endphp
+                    @if($maxNum % 10 != 0){{--１０で割り切れない場合、割り切れるまで１を足し続ける--}}
+                        @while ($maxNum % 10 != 0)
+                            @php
+                                $maxNum++
+                            @endphp
+                        @endwhile
+                    @endif
+                    @if($maxNum != 10){{--１ページ目に戻るボタン--}}
+                        <a href="{{ url('/') }}" class="relative inline-flex items-center rounded my-1 px-2 py-1 -ml-px font-medium text-gray-800 bg-white leading-5 hover:bg-gray-200 focus:z-10 focus:outline-none focus:ring ring-gray-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">...</a>
+                    @endif
+
+                    @php
+                        $numberOfElement = 0;//「・・・」などの区切り文字がelements配列の中に入ってくる。本当のページの数を数えるための変数
+                    @endphp
                     @foreach ($elements as $element)
                         {{-- "Three Dots" Separator --}}
-                        @if (is_string($element))
+                        {{-- @if (is_string($element) && $element == $firstElement)
                             <span aria-disabled="true">
-                                <span class="relative inline-flex rounded items-center my-1 px-2 py-1 -ml-px text-sm font-medium cursor-default leading-5 bg-green-700 text-white">{{ $element }}</span>
+                                <span class="relative inline-flex rounded items-center my-1 px-2 py-1 -ml-px text-sm font-medium cursor-default leading-5 text-gray-800 bg-white hover:bg-gray-200 hover:cursor-pointer focus:z-10 focus:outline-none focus:ring ring-gray-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">{{ $element }}</span>
                             </span>
-                        @endif
+                        @else
+                        @endif --}}
 
                         {{-- Array Of Links --}}
                         @if (is_array($element))
                             @php
-                                $maxNum = $paginator->currentPage();
+                                $numberOfElement += count($element);
                             @endphp
-                            @if($maxNum % 10 != 0){{--１０で割り切れない場合、割り切れるまで１を足し続ける--}}
-                                @while ($maxNum % 10 != 0)
-                                    @php
-                                        $maxNum++
-                                    @endphp
-                                @endwhile
-                            @endif
-                            @if($maxNum != 10)
-                                <a href="{{ url('/') }}" class="relative inline-flex items-center rounded my-1 px-2 py-1 -ml-px font-medium text-gray-800 bg-white leading-5 hover:bg-gray-200 focus:z-10 focus:outline-none focus:ring ring-gray-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">...</a>
-                            @endif
+
                             @foreach ($element as $page => $url)
                                 @if($page >= $maxNum - 9 && $page <= $maxNum)
                                     @if ($page == $paginator->currentPage())
@@ -96,11 +105,11 @@
                                     @endif
                                 @endif
                             @endforeach
-                            @if($maxNum < count($element))
-                                <a href="{{ url('/') }}?page={{ $maxNum + 1 }}" class="relative inline-flex items-center rounded my-1 px-2 py-1 -ml-px font-medium text-gray-800 bg-white leading-5 hover:bg-gray-200 focus:z-10 focus:outline-none focus:ring ring-gray-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">...</a>
-                            @endif
                         @endif
                     @endforeach
+                    @if($maxNum < $numberOfElement)
+                        <a href="{{ url('/') }}?page={{ $maxNum + 1 }}" class="relative inline-flex items-center rounded my-1 px-2 py-1 -ml-px font-medium text-gray-800 bg-white leading-5 hover:bg-gray-200 focus:z-10 focus:outline-none focus:ring ring-gray-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">...</a>
+                    @endif
                     {{--ここでclickで次の１０個を表示するのは難しいー＞JSで管理する必要がある--}}
                     {{-- Next Page Link --}}
                     @if ($paginator->hasMorePages())
